@@ -1,47 +1,66 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  <div id="app">
+    <header>
+      <h1>Quizzix</h1>
+    </header>
+    <main>
+      <div v-if="loading" class="loading">Загрузка квизов...</div>
+      <ul v-else class="quiz-list">
+        <li v-for="quiz in quizzes" :key="quiz.id" class="quiz-item">
+          {{ quiz.name }}
+        </li>
+      </ul>
+    </main>
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
+<script setup>
+import { ref, onMounted } from 'vue'
+
+const quizzes = ref([])
+const loading = ref(true)
+
+const fetchQuizzes = async () => {
+  try {
+    const response = await fetch('/api/quizzes')
+    quizzes.value = await response.json()
+  } catch (error) {
+    console.error('Ошибка загрузки квизов:', error)
+  } finally {
+    loading.value = false
+  }
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+onMounted(fetchQuizzes)
+</script>
+
+<style>
+#app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
 }
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+header h1 {
+  color: #42b883;
+  text-align: center;
+  margin-bottom: 30px;
+}
+.quiz-list {
+  list-style: none;
+  padding: 0;
+}
+.quiz-item {
+  padding: 15px 20px;
+  background: blue;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border-left: 4px solid #42b883;
+  font-size: 18px;
+}
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
 }
 </style>
