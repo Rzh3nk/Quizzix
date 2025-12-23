@@ -1,1 +1,24 @@
-"node_modules/\n.env\n.DS_Store" 
+# Dependencies
+node_modules/
+backend/go.work
+bin/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Go
+/backend/bin/
