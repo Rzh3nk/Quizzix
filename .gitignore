@@ -22,3 +22,7 @@ Thumbs.db
 
 # Go
 /backend/bin/
+
+# SQLite database
+backend/quizzix.db
+*.db
