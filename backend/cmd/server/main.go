@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/Rzh3nk/quizzix/backend/internal/models"
 	"github.com/gin-gonic/gin"
@@ -33,30 +32,15 @@ func main() {
 	//раутеры
 	r := gin.Default()
 	r.GET("/api/quizzes", getQuizzes)
+	r.GET("/api/categories", getCategories)
 	r.GET("/api/quizzes/:id/questions", getQuestions)
-
+	r.GET("/api/question/:id/answers", getAnswers)
+	r.GET("/api/users/:id", getUser)
+	r.GET("/api/register", register)
+	r.GET("/api/login", login)
 	log.Println("Backend запущен")
 
 	r.Run(":8080")
-}
-
-func getQuizzes(c *gin.Context) {
-	var quizzes []models.Quiz
-	if err := db.Find(&quizzes).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
-		return
-	}
-	c.JSON(http.StatusOK, quizzes)
-}
-
-func getQuestions(c *gin.Context) {
-	quizID := c.Param("id")
-	var questions []models.Question
-	if err := db.Where("quiz_id = ?", quizID).Preload("Answers").Find(&questions).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
-		return
-	}
-	c.JSON(http.StatusOK, questions)
 }
 
 // тестовые данные
@@ -68,7 +52,16 @@ func seedDemoData() {
 	}
 
 	db.Create(&models.Quiz{Title: "Наука"})
-	db.Create(&models.Question{Text: "Вопрос 1", QuizID: 1})
 	db.Create(&models.Quiz{Title: "Кино"})
 	db.Create(&models.Quiz{Title: "История"})
+
+	db.Create(&models.Question{Text: "Вопрос 1", QuizID: 1})
+	db.Create(&models.Question{Text: "Вопрос 2", QuizID: 1})
+	db.Create(&models.Question{Text: "Вопрос 3", QuizID: 1})
+
+	db.Create(&models.Answer{Text: "Правильный", QuestionID: 1, IsCorrect: true})
+	db.Create(&models.Answer{Text: "Неправильный", QuestionID: 1, IsCorrect: false})
+
+	db.Create(&models.Answer{Text: "Неправильный", QuestionID: 2, IsCorrect: false})
+	db.Create(&models.Answer{Text: "Правильный", QuestionID: 2, IsCorrect: true})
 }

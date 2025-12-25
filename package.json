@@ -4,7 +4,7 @@
   "description": "Zynquiz - dynamic quiz web app",
   "scripts": {
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
-    "backend": "cd backend && go run cmd/server/main.go",
+    "backend": "cd backend/cmd/server && go run .",
     "frontend": "cd frontend && npm run dev",
     "build": "cd frontend && npm run build && cd ../backend && go build -o ../bin/server cmd/server/main.go",
     "test": "cd backend && go test ./... -v -race && cd ../frontend && npm test",
