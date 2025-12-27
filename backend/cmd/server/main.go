@@ -36,8 +36,9 @@ func main() {
 	r.GET("/api/quizzes/:id/questions", getQuestions)
 	r.GET("/api/question/:id/answers", getAnswers)
 	r.GET("/api/users/:id", getUser)
-	r.GET("/api/register", register)
-	r.GET("/api/login", login)
+	r.POST("/api/register", register)
+	r.POST("/api/login", login)
+	r.POST("/api/quizzes/:id/submit", checkTest)
 	log.Println("Backend запущен")
 
 	r.Run(":8080")

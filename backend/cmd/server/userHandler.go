@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -20,6 +21,7 @@ type registerRequest struct {
 }
 
 func register(c *gin.Context) {
+	log.Println("registering user")
 	var req registerRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
@@ -60,7 +62,7 @@ func login(c *gin.Context) {
 	}
 	var user models.User
 	//проверка по нику(можно сделать еще почту)
-	if err := db.Where("usrername = ?", req.Username).First(&user).Error; err != nil {
+	if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
@@ -83,6 +85,7 @@ func login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "token error"})
 		return
 	}
+	log.Println("login suc")
 	//возвращаем данные залогиненного пользователя
 	c.JSON(http.StatusOK, gin.H{
 		"token":    tokenString,

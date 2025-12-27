@@ -1,7 +1,7 @@
 {
   "name": "quizzix",
   "version": "1.0.0",
-  "description": "Zynquiz - dynamic quiz web app",
+  "description": "Quizzix - dynamic quiz web app",
   "scripts": {
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
     "backend": "cd backend/cmd/server && go run .",
