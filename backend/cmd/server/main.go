@@ -41,6 +41,7 @@ func main() {
 	r.POST("/api/quizzes/:id/submit", checkTest)
 	r.GET("/api/users/:id/results", getUserResults)
 	r.GET("/api/leaderboard", getLeaderboard)
+	r.POST("/api/quizzes", createQuiz)
 	log.Println("Backend запущен")
 
 	r.Run(":8080")
@@ -57,6 +58,8 @@ func seedDemoData() {
 	db.Create(&models.Quiz{Title: "Наука"})
 	db.Create(&models.Quiz{Title: "Кино"})
 	db.Create(&models.Quiz{Title: "История"})
+
+	db.Create(&models.Category{Name: "Наука"})
 
 	db.Create(&models.Question{Text: "Вопрос 1", QuizID: 1})
 	db.Create(&models.Question{Text: "Вопрос 2", QuizID: 1})
