@@ -161,7 +161,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
 export default {
-  name: 'RegisterView',
+  name: 'Register',
   
   setup() {
     const router = useRouter()

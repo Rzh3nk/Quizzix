@@ -1,6 +1,10 @@
-import './assets/base.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'
+import router from './router/router' // Маршрутизация
 
-createApp(App).mount('#app')
+
+const app = createApp(App); // Создание экземпляра приложения
+app.use(router); // Подключение маршрутизации
+app.mount('#app')
+

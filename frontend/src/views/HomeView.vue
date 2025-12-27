@@ -62,12 +62,12 @@ export default {
     
     const goToLogin = () => {
       console.log('Переход на страницу входа')
-      alert('Страница входа будет доступна после создания компонента LoginView')
+      router.push('/login')
     }
     
     const goToRegister = () => {
       console.log('Переход на страницу регистрации')
-      alert('Страница регистрации будет доступна после создания компонента RegisterView')
+      router.push('/register')
     }
     
     const continueAsGuest = () => {

@@ -1,19 +1,9 @@
 <template>
   <div id="app">
-    <Register />
-    
+    <router-view />
   </div>
 </template>
 
-<script setup>
-
-import Register from './views/Register.vue';
-
-//import HomeView from '@/views/HomeView.vue'
-
-//import AppHeader from './components/AppHeader.vue'
-
-</script>
 
 <script>
 import { defineComponent } from 'vue';
