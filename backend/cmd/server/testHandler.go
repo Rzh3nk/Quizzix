@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"math"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/Rzh3nk/quizzix/backend/internal/models"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type quizAnswers struct {
@@ -78,12 +80,41 @@ func checkTest(c *gin.Context) {
 		totalScore += math.Round(queScore*100) / 100
 	}
 	quizIDint, _ := strconv.ParseUint(quizID, 10, 64)
+	quizIDuint := uint(quizIDint)
+
+	var bestBefore models.Result
+	bestBeforeScore := 0.0
+
+	if err := db.
+		Where("user_id = ? AND quiz_id = ?", answers.User_id, quizIDuint).
+		Order("score DESC").
+		First(&bestBefore).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			bestBeforeScore = 0.0
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
+			return
+		}
+	} else {
+		bestBeforeScore = bestBefore.Score
+	}
+
+	if totalScore > bestBeforeScore {
+		if err := db.Model(&models.User{}).
+			Where("id = ?", answers.User_id).
+			Update("total_points", gorm.Expr("total_points + ?", totalScore-bestBeforeScore)).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
+			return
+		}
+	}
+
 	result := models.Result{
 		Score:    totalScore,
 		MaxScore: totalQuestions,
 		UserID:   answers.User_id,
-		QuizID:   uint(quizIDint),
+		QuizID:   quizIDuint,
 	}
+
 	if err := db.Create(&result).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "result exists or db error"})
 		return

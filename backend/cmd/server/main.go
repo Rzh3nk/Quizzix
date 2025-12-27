@@ -39,6 +39,8 @@ func main() {
 	r.POST("/api/register", register)
 	r.POST("/api/login", login)
 	r.POST("/api/quizzes/:id/submit", checkTest)
+	r.GET("/api/users/:id/results", getUserResults)
+	r.GET("/api/leaderboard", getLeaderboard)
 	log.Println("Backend запущен")
 
 	r.Run(":8080")

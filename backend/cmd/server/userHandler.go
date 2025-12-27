@@ -109,3 +109,14 @@ func getUser(c *gin.Context) {
 		"created":  user.CreatedAt,
 	})
 }
+func getUserResults(c *gin.Context) {
+	id := c.Param("id")
+	var results []models.Result
+	if err := db.Where("user_id = ?", id).
+		Order("created_at DESC").Find(&results).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, results)
+}
