@@ -55,11 +55,13 @@ func seedDemoData() {
 		return
 	}
 
-	db.Create(&models.Quiz{Title: "Наука"})
-	db.Create(&models.Quiz{Title: "Кино"})
-	db.Create(&models.Quiz{Title: "История"})
+	db.Create(&models.Category{Name: "Наука", Description: "В этой категории представленые науные квизы"})
+	db.Create(&models.Category{Name: "Кино", Description: "В этой категории представленые квизы по кино"})
+	db.Create(&models.Category{Name: "История", Description: "В этой категории представленые исторические квизы"})
 
-	db.Create(&models.Category{Name: "Наука"})
+	db.Create(&models.Quiz{Title: "Квиз по науке", Description: "Описание квиза по науке", CategoryID: 1})
+	db.Create(&models.Quiz{Title: "Квиз по кино", Description: "Описание квиза по кино", CategoryID: 2})
+	db.Create(&models.Quiz{Title: "Квиз по истории", Description: "Описание квиза по истории", CategoryID: 3})
 
 	db.Create(&models.Question{Text: "Вопрос 1", QuizID: 1})
 	db.Create(&models.Question{Text: "Вопрос 2", QuizID: 1})

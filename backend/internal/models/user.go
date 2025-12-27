@@ -6,6 +6,6 @@ type User struct {
 	gorm.Model
 	Username   string `gorm:"uniqueIndex" json:"username"`
 	Email      string `gorm:"uniqueIndex" json:"email"`
-	Password   string `json:"-"` // хэш нужен
+	Password   string `json:"-"`
 	TotalScore int    `json:"total_score"`
 }
