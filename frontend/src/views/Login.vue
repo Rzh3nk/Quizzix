@@ -216,13 +216,14 @@ export default {
         
         
         // Обновляем состояние в store
+        authStore.token.value = token
         authStore.login({
           id: user_id,
           username: username,
           email: email,
           token: token
         })
-        
+        authStore.checkAuth()
         // Показываем успешное сообщение
         successMessage.value = 'Вход выполнен успешно!'
         

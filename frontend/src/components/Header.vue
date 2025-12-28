@@ -186,24 +186,26 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/store/auth'
+import { useAuthStore } from '@/store/auth.js'  // ✅ .js обязательно!
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+// ✅ ИСПРАВЬТЕ computed:
+const isAuthenticated = computed(() => {
+  // auth.js возвращает isAuthenticated как функцию computed()
+  return authStore.isAuthenticated.value || !!authStore.user?.value
+})
+
+const user = computed(() => {
+  return authStore.user?.value || null  // ✅ .value для ref
+})
 
 // Реактивные данные
 const showUserMenu = ref(false)
 const showMobileMenu = ref(false)
 const userMenuRef = ref(null)
 
-// Компьютеды
-const isAuthenticated = computed(() => {
-  return authStore.isAuthenticated?.value || !!authStore.user
-})
-
-const user = computed(() => {
-  return authStore.user || null
-})
 
 // Методы
 const toggleUserMenu = () => {

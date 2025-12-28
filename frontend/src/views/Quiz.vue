@@ -131,111 +131,7 @@
             </div>
           </div>
 
-          <!-- Детальная информация -->
-          <div class="quiz-details">
-            <!-- Сложность и требования -->
-            <div class="details-section">
-              <h3 class="section-title">
-                <span class="section-icon">📊</span>
-                Информация о квизе
-              </h3>
-              
-              <div class="details-grid">
-                <div class="detail-item">
-                  <span class="detail-icon">⚡</span>
-                  <div class="detail-content">
-                    <div class="detail-label">Сложность</div>
-                    <div class="detail-value" :class="quiz.difficulty">
-                      {{ getDifficultyText(quiz.difficulty || 'medium') }}
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="detail-item">
-                  <span class="detail-icon">⏱️</span>
-                  <div class="detail-content">
-                    <div class="detail-label">Время</div>
-                    <div class="detail-value">
-                      {{ quiz.timeLimit ? `${quiz.timeLimit} минут` : 'Без ограничения' }}
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="detail-item">
-                  <span class="detail-icon">❓</span>
-                  <div class="detail-content">
-                    <div class="detail-label">Вопросы</div>
-                    <div class="detail-value">{{ questionCount }}</div>
-                  </div>
-                </div>
-                
-                <div class="detail-item">
-                  <span class="detail-icon">🎯</span>
-                  <div class="detail-content">
-                    <div class="detail-label">Тип вопросов</div>
-                    <div class="detail-value">С выбором ответа</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Советы по прохождению -->
-            <div class="tips-section">
-              <h3 class="section-title">
-                <span class="section-icon">💡</span>
-                Советы по прохождению
-              </h3>
-              
-              <div class="tips-list">
-                <div class="tip-item">
-                  <span class="tip-icon">👀</span>
-                  <div class="tip-content">Внимательно читайте вопросы и варианты ответов</div>
-                </div>
-                
-                <div class="tip-item">
-                  <span class="tip-icon">⏱️</span>
-                  <div class="tip-content">Следите за временем, если установлен лимит</div>
-                </div>
-                
-                <div class="tip-item">
-                  <span class="tip-icon">🤔</span>
-                  <div class="tip-content">Не спешите отвечать - подумайте над каждым вопросом</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Лучшие результаты -->
-            <div v-if="topResults.length > 0" class="leaderboard-section">
-              <h3 class="section-title">
-                <span class="section-icon">🏆</span>
-                Лучшие результаты
-              </h3>
-              
-              <div class="leaderboard">
-                <div 
-                  v-for="(result, index) in topResults" 
-                  :key="result.id" 
-                  class="leaderboard-item"
-                  :class="{ 'first': index === 0, 'second': index === 1, 'third': index === 2 }"
-                >
-                  <div class="rank">
-                    <span class="rank-number">{{ index + 1 }}</span>
-                    <span class="rank-icon">{{ getRankIcon(index) }}</span>
-                  </div>
-                  
-                  <div class="player-info">
-                    <div class="player-name">{{ result.userName || 'Аноним' }}</div>
-                    <div class="player-score">{{ result.score }}%</div>
-                  </div>
-                  
-                  <div class="result-info">
-                    <div class="result-time">{{ formatDuration(result.timeSpent) }}</div>
-                    <div class="result-date">{{ formatDate(result.createdAt) }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          
 
           <!-- Кнопки действий -->
           <div class="action-buttons">
@@ -262,7 +158,6 @@ import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 
-//const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
 // Реактивные данные
 const quiz = ref(null)
@@ -284,7 +179,7 @@ const fetchQuiz = async () => {
     error.value = null
     
     console.log(quizId.value)
-    const response = await fetch(`/api/quiz/${quizId.value}`)
+    const response = await fetch(`/api/quizzes/${quizId.value}`)
     
     if (!response.ok) {
       if (response.status === 404) {
@@ -295,74 +190,18 @@ const fetchQuiz = async () => {
     
     quiz.value = await response.json()
     
-    // Загружаем топ результаты
-    await fetchTopResults()
     
   } catch (err) {
     console.error('Ошибка загрузки квиза:', err)
     error.value = err.message || 'Не удалось загрузить квиз'
     
-    // Мок данные для разработки
-    if (import.meta.env.DEV) {
-      quiz.value = createMockQuiz()
-      topResults.value = createMockResults()
-    }
+  
   } finally {
     loading.value = false
   }
 }
 
-const fetchTopResults = async () => {
-  try {
-    const response = await fetch(`/api/quiz/${quizId.value}/results/top`)
-    if (response.ok) {
-      topResults.value = await response.json()
-    }
-  } catch (err) {
-    console.error('Ошибка загрузки результатов:', err)
-    // Используем мок данные
-    topResults.value = createMockResults()
-  }
-}
 
-const createMockQuiz = () => {
-  return {
-    id: quizId.value,
-    title: 'История Древнего Рима',
-    description: 'Проверьте свои знания о Римской империи, её императорах, завоеваниях и культуре. От основания города до падения империи.',
-    ImgURL: null,
-    difficulty: 'medium',
-    timeLimit: 20,
-    plays: 1245,
-    rating: 4.7,
-    authorName: 'Иван Иванов',
-    authorStats: {
-      quizCount: 15,
-      totalPlays: 8900
-    },
-    category: {
-      id: 1,
-      name: 'История'
-    },
-    category_id: 1,
-    createdAt: new Date().toISOString(),
-    Questions: Array.from({ length: 15 }, (_, i) => ({
-      id: i + 1,
-      text: `Вопрос ${i + 1}`,
-      answers: []
-    }))
-  }
-}
-
-const createMockResults = () => {
-  return [
-    { id: 1, userName: 'Алексей Петров', score: 98, timeSpent: 850, createdAt: new Date(Date.now() - 86400000).toISOString() },
-    { id: 2, userName: 'Мария Смирнова', score: 95, timeSpent: 920, createdAt: new Date(Date.now() - 172800000).toISOString() },
-    { id: 3, userName: 'Дмитрий Иванов', score: 93, timeSpent: 780, createdAt: new Date(Date.now() - 259200000).toISOString() },
-    { id: 4, userName: 'Анна Козлова', score: 90, timeSpent: 1100, createdAt: new Date(Date.now() - 345600000).toISOString() },
-    { id: 5, userName: 'Сергей Волков', score: 88, timeSpent: 950, createdAt: new Date(Date.now() - 432000000).toISOString() }
-  ]
-}
 
 const getImageUrl = (path) => {
   if (!path) return ''

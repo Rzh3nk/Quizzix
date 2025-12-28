@@ -1,5 +1,6 @@
 <template>
   <div class="categories-page">
+    <Header/>
     <!-- Фон -->
     <div class="background"></div>
 
@@ -164,6 +165,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
+
+import Header from '@/components/Header.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

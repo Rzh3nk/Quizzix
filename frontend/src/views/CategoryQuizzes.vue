@@ -93,7 +93,7 @@
             v-for="quiz in filteredQuizzes"
             :key="quiz.id"
             class="quiz-card"
-            @click="goToQuiz(quiz.id)"
+            @click="goToQuiz(quiz.ID)"
           >
             <!-- Изображение квиза -->
             <div class="quiz-image-container">

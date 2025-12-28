@@ -56,6 +56,15 @@ const routes = [
         }
     },
     {
+        path: '/quiz/:id/play',
+        name: 'quizgo',
+        component: () => import('../views/Question.vue'),
+        props: true,
+        meta: {
+            title: "Прохождение квиза"
+        }
+    },
+    {
         path: "/create-quiz",
         name: "create",
         component: () => import('../views/QuizAdd.vue'),
@@ -63,7 +72,7 @@ const routes = [
         meta: {
             title: "Создание квиза"
         }
-    },
+    }
 ];
 
 const router = createRouter({
