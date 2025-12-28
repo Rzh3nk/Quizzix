@@ -250,7 +250,7 @@ const fetchCategoryQuizzes = async () => {
     const data = await response.json()
     
     category.value = data.category
-    quizzes.value = data.quizzes || []
+    quizzes.value = data
     
     console.log('Данные загружены:', data)
     
