@@ -1,11 +1,12 @@
 <template>
   <div class="categories-page">
-    <Header/>
+
     <!-- Фон -->
     <div class="background"></div>
-
+    <Header/>
     <!-- Контент -->
     <div class="content-wrapper">
+      
       <!-- Логотип и название -->
       <div class="logo-row">
         <div class="logo-circle">Q</div>
@@ -170,7 +171,7 @@ import Header from '@/components/Header.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
-
+const quizCounts = ref({})
 //const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
 const searchQuery = ref('')
@@ -198,7 +199,17 @@ const fetchCategories = async () => {
     }
     
     const data = await response.json()
-    
+    await Promise.all(
+      data.map(async (category) => {
+        try {
+          const quizzesRes = await fetch(`/api/categories/${category.ID}/quizzes`)
+          const quizzes = await quizzesRes.json()
+          category.QuizCount = quizzes.length
+        } catch (err) {
+          category.QuizCount = 0
+        }
+      })
+    )
     // Добавляем дополнительные поля для отображения
     categories.value = data.map(category => ({
       ...category,
@@ -221,7 +232,15 @@ const fetchCategories = async () => {
     loading.value = false
   }
 }
-
+const loadQuizCount = async (categoryId) => {
+  try {
+    const response = await fetch(`/api/categories/${categoryId}/quizzes`)
+    const quizzes = await response.json()
+    quizCounts.value[categoryId] = quizzes.length  // ✅ Считаем!
+  } catch (err) {
+    quizCounts.value[categoryId] = 0
+  }
+}
 // Фильтрация категорий по поиску
 const filteredCategories = computed(() => {
   if (!searchQuery.value) return categories.value

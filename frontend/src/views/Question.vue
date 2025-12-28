@@ -290,12 +290,8 @@ const fetchQuiz = async () => {
     }
     
     // Загружаем квиз с вопросами
-    let apiUrl
-    if (import.meta.env.DEV && API_URL.includes('localhost:8080')) {
-      apiUrl = `/api/quizzes/${quizId.value}`
-    } else {
-      apiUrl = `/api/quizzes/${quizId.value}`
-    }
+    
+
     
     const token = localStorage.getItem('token')
     const headers = {
@@ -305,35 +301,43 @@ const fetchQuiz = async () => {
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
-    
-    const response = await fetch(apiUrl, { headers })
-    
-    if (!response.ok) {
-      if (response.status === 404) {
+
+    let quizUrl = `/api/quizzes/${quizId.value}`
+    const quizResponse = await fetch(quizUrl, { headers })
+
+    if (!quizResponse.ok) {
+      if (quizResponse.status === 404) {
         throw new Error('Квиз не найден')
       }
-      throw new Error(`Ошибка ${response.status}`)
+      throw new Error(`Ошибка ${quizResponse.status}`)
     }
-    
-    const data = await response.json()
-    
-    // Преобразуем данные
+
+    const quizData = await quizResponse.json()
+
+    // ✅ Преобразуем данные квиза
     quiz.value = {
-      ID: data.id || data.ID,
-      Title: data.title || data.Title,
-      Description: data.description || data.Description
+      ID: quizData.id || quizData.ID,
+      Title: quizData.title || quizData.Title,
+      Description: quizData.description || quizData.Description
     }
-    
-    // Получаем вопросы (если они есть в ответе)
-    questions.value = data.questions || data.Questions || []
-    
+
+    // 2. Получаем ВОПРОСЫ отдельно
+    let questionsUrl = `/api/quizzes/${quizId.value}/questions`
+    const questionsResponse = await fetch(questionsUrl, { headers })
+
+    if (!questionsResponse.ok) {
+      throw new Error('Вопросы не найдены')
+    }
+
+    const questionsData = await questionsResponse.json()
+    questions.value = questionsData || []
+
     if (questions.value.length === 0) {
       throw new Error('В этом квизе нет вопросов')
     }
-    
-    // Инициализируем структуру ответов
+
+    // ✅ Инициализируем ответы
     initializeAnswers()
-    
   } catch (err) {
     console.error('Ошибка загрузки квиза:', err)
     error.value = err.message || 'Не удалось загрузить вопросы'
@@ -485,12 +489,8 @@ const submitQuiz = async () => {
     console.log('Отправляемые ответы:', payload)
     
     // Отправляем ответы на сервер
-    let apiUrl
-    if (import.meta.env.DEV && API_URL.includes('localhost:8080')) {
-      apiUrl = `/api/quizzes/${quizId.value}/submit`
-    } else {
-      apiUrl = `/api/quizzes/${quizId.value}/submit`
-    }
+    let apiUrl = `/api/quizzes/${quizId.value}/submit`
+   
     
     const token = localStorage.getItem('token')
     const headers = {
