@@ -15,3 +15,12 @@ func getCategories(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, categories)
 }
+func getCategoryQuizzes(c *gin.Context) {
+	categoryID := c.Param("id")
+	var quizzes []models.Quiz
+	if err := db.Where("category_id = ?", categoryID).Find(&quizzes).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
+		return
+	}
+	c.JSON(http.StatusOK, quizzes)
+}
