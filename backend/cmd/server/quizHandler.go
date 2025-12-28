@@ -33,6 +33,16 @@ func getQuizzes(c *gin.Context) {
 	c.JSON(http.StatusOK, quizzes)
 }
 
+func getQuizByID(c *gin.Context) {
+	id := c.Param("id")
+	var quiz models.Quiz
+	if err := db.Where("id = ?", id).First(&quiz).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
+		return
+	}
+	c.JSON(http.StatusOK, quiz)
+}
+
 func createQuiz(c *gin.Context) {
 	var req createQuizRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
