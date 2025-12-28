@@ -2,7 +2,7 @@
   <div class="category-quizzes-page">
     <!-- Фон -->
     <div class="background"></div>
-
+<Header/>
     <!-- Контент -->
     <div class="content-wrapper">
       <!-- Хлебные крошки -->
@@ -185,7 +185,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
-
+import Header from '@/components/Header.vue'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
@@ -213,7 +213,20 @@ const fetchCategoryQuizzes = async () => {
     error.value = null
     
     console.log(`Загрузка квизов для категории ${categoryId.value}...`)
+        const categoryResponse = await fetch(`/api/categories/${categoryId.value}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
     
+    if (!categoryResponse.ok) {
+      throw new Error(`Категория не найдена: ${categoryResponse.status}`)
+    }
+    
+    category.value = await categoryResponse.json()
+
+
     // Формируем URL с параметрами
     let url = `/api/categories/${categoryId.value}/quizzes`
     const params = []
@@ -249,9 +262,40 @@ const fetchCategoryQuizzes = async () => {
     
     const data = await response.json()
     
-    category.value = data.category
     quizzes.value = data
+    const quizzesWithQuestionCount = await Promise.all(
+      (data.quizzes || data).map(async (quiz) => {
+        try {
+          const quizId = quiz.id || quiz.ID
+          if (!quizId) return quiz
+          
+          // Запрос вопросов
+          const questionsResponse = await fetch(`/api/quizzes/${quizId}/questions`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          
+          if (questionsResponse.ok) {
+            const questions = await questionsResponse.json()
+            const questionCount = Array.isArray(questions) ? questions.length : 0
+            
+            // ✅ Добавляем questionCount
+            return {
+              ...quiz,
+              questionCount: questionCount
+            }
+          }
+        } catch (err) {
+          console.warn(`Не удалось загрузить вопросы для квиза ${quiz.id || quiz.ID}:`, err)
+        }
+        
+        return quiz  // Возвращаем без questionCount
+      })
+    )
     
+    // 4. ✅ Сохраняем
+    quizzes.value = quizzesWithQuestionCount
     console.log('Данные загружены:', data)
     
   } catch (err) {

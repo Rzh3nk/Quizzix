@@ -2,7 +2,7 @@
   <div class="create-quiz-page">
     <!-- Фон -->
     <div class="background"></div>
-
+<Header/>
     <!-- Контент -->
     <div class="content-wrapper">
       <!-- Хлебные крошки -->
@@ -322,7 +322,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
+import Header from '@/components/Header.vue'
 // Основные данные квиза
 const title = ref('')
 const description = ref('')
@@ -474,7 +474,8 @@ const fetchCategories = async () => {
 const createQuiz = async () => {
   error.value = ''
   success.value = ''
-  
+const authorId = localStorage.getItem('user_id')  // "1"
+  console.log('🔍 authorId:', authorId)
   if (!isFormValid.value) {
     error.value = 'Пожалуйста, заполните все обязательные поля правильно'
     return
@@ -484,6 +485,7 @@ const createQuiz = async () => {
   
   try {
     const payload = {
+  author_id: parseInt(authorId),
       title: title.value.trim(),
       description: description.value.trim(),
       category_id: categoryId.value,

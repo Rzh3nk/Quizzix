@@ -14,11 +14,17 @@ const routes = [
     {
     path: "/main",
         name: "main",
+        alias: "/categories",
         component: () => import('../views/Categories.vue'),
         props: true, // указываем, что компонент Category.vue может принимать параметры в адресной строке, например, в path указан id
         meta: {
             title: "Квизы!"
         }
+    },
+    {
+        path: '/profile',
+        name: 'Profile',
+        component: () => import('@/views/Profil.vue')
     },
     {
         path: "/login", // указание маршрута, по которому будем переходить к списку категорий
@@ -72,6 +78,16 @@ const routes = [
         meta: {
             title: "Создание квиза"
         }
+    },
+    {
+        path: '/my-quizzes',
+        name: 'MyQuizzes',
+        component: () => import('@/views/MyQuizzes.vue')
+    },
+    {
+        path: '/leaderboard',
+        name: 'Leaderboard',
+        component: () => import('@/views/Leaderboard.vue')
     }
 ];
 

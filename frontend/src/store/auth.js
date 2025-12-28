@@ -76,7 +76,11 @@ const login = async (credentials) => {
     
     // Сохраняем в localStorage
     localStorage.setItem('token', authToken)
-    localStorage.setItem('user', JSON.stringify(userData))
+      localStorage.setItem('user', JSON.stringify({
+        id: data.user_id,      
+        username: data.username,
+        email: data.email
+      }))
     
     // Добавляем токен в заголовки axios
     api.defaults.headers.common['Authorization'] = `Bearer ${authToken}`

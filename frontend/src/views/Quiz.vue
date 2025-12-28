@@ -2,7 +2,7 @@
   <div class="quiz-detail-page">
     <!-- Фон -->
     <div class="background"></div>
-
+<Header/>
     <!-- Контент -->
     <div class="content-wrapper">
       <!-- Хлебные крошки -->
@@ -79,7 +79,7 @@
                 </span>
                 <span class="quiz-created">
                   <span class="date-icon">📅</span>
-                  {{ formatDate(quiz.createdAt) }}
+                  {{ formatDate(quiz.created_at) }}
                 </span>
               </div>
 
@@ -94,7 +94,7 @@
                 <div class="stat">
                   <div class="stat-icon">❓</div>
                   <div class="stat-content">
-                    <div class="stat-value">{{ questionCount }}</div>
+                    <div class="stat-value">{{ quiz.questionCount || 0}}</div>
                     <div class="stat-label">вопросов</div>
                   </div>
                 </div>
@@ -157,7 +157,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
-
+import Header from '@/components/Header.vue'
 
 // Реактивные данные
 const quiz = ref(null)
@@ -178,17 +178,70 @@ const fetchQuiz = async () => {
     loading.value = true
     error.value = null
     
-    console.log(quizId.value)
-    const response = await fetch(`/api/quizzes/${quizId.value}`)
+    console.log('Загрузка квиза:', quizId.value)
     
-    if (!response.ok) {
-      if (response.status === 404) {
+    // 1. ✅ Основной квиз
+    const quizResponse = await fetch(`/api/quizzes/${quizId.value}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    
+    if (!quizResponse.ok) {
+      if (quizResponse.status === 404) {
         throw new Error('Квиз не найден')
       }
       throw new Error('Ошибка загрузки квиза')
     }
     
-    quiz.value = await response.json()
+    let quizData = await quizResponse.json()
+    
+    const quizIdNum = quizData.id || quizData.ID
+    
+    // 2. ✅ Количество вопросов
+    try {
+      const questionsResponse = await fetch(`/api/quizzes/${quizIdNum}/questions`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      })
+      if (questionsResponse.ok) {
+        const questions = await questionsResponse.json()
+        quizData.questionCount = Array.isArray(questions) ? questions.length : 0
+      }
+    } catch (err) {
+      console.warn('Не удалось загрузить вопросы:', err)
+    }
+    
+    // 3. ✅ Количество прохождений
+    try {
+      const resultsResponse = await fetch(`/api/results/${quizIdNum}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      })
+      if (resultsResponse.ok) {
+        const resultsData = await resultsResponse.json()
+        quizData.plays = resultsData.plays || 0
+      }
+    } catch (err) {
+      console.warn('Не удалось загрузить статистику:', err)
+    }
+    
+    // 4. ✅ Категория (если нужно)
+    if (quizData.category_id || quizData.CategoryID) {
+      const categoryId = quizData.category_id || quizData.CategoryID
+      try {
+        const categoryResponse = await fetch(`/api/categories/${categoryId}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        })
+        if (categoryResponse.ok) {
+          quizData.category = await categoryResponse.json()
+        }
+      } catch (err) {
+        console.warn('Не удалось загрузить категорию:', err)
+      }
+    }
+    
+    quiz.value = quizData
+    console.log('✅ Полный квиз:', quiz.value)
+    
     
     
   } catch (err) {
@@ -245,8 +298,17 @@ const getDifficultyText = (difficulty) => {
 }
 
 const formatDate = (dateString) => {
-  if (!dateString) return ''
+  if (!dateString || dateString === 'null' || dateString === 'undefined') {
+    return 'Недавно'
+  }
+  
   const date = new Date(dateString)
+  
+  if (isNaN(date.getTime())) {
+    console.warn('Невалидная дата:', dateString)
+    return 'Неизвестно'
+  }
+  
   return date.toLocaleDateString('ru-RU', {
     day: 'numeric',
     month: 'long',
@@ -274,10 +336,15 @@ const startQuiz = () => {
 }
 
 const goBack = () => {
-  if (window.history.length > 1) {
-    router.back()
+  if (quiz.value?.category?.id || quiz.value?.category_id) {
+    const categoryId = quiz.value.category?.id || quiz.value.category_id
+    router.push(`/category/${categoryId}/quizzes`)
   } else {
-    router.push('/categories')
+    if (window.history.length > 1) {
+      router.back()
+    } else {
+      router.push('/categories')
+    }
   }
 }
 

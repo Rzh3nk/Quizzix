@@ -144,7 +144,7 @@
                   @click="toggleAnswer(answer)"
                 >
                   <div class="answer-selector">
-                    <div v-if="currentQuestion.isMultiple" class="checkbox">
+                    <div v-if="isMultipleChoice" class="checkbox">
                       <div class="checkbox-inner" :class="{ 'checked': isAnswerSelected(answer) }"></div>
                     </div>
                     <div v-else class="radio">
@@ -272,13 +272,26 @@ const progressPercentage = computed(() => {
   return ((currentQuestionIndex.value + 1) / questions.value.length) * 100
 })
 
+// ✅ НОВОЕ — считаем правильные ответы
+const correctAnswersCount = computed(() => {
+  if (!currentQuestion.value?.answers) return 0
+  return currentQuestion.value.answers.filter(answer => 
+    answer.is_correct === true
+  ).length
+})
+
+const isMultipleChoice = computed(() => {
+  return correctAnswersCount.value > 1
+})
+
+// ✅ hasSelectedAnswers тоже обновите
 const hasSelectedAnswers = computed(() => {
   if (!currentQuestion.value) return false
   
   const questionId = currentQuestion.value.id || currentQuestion.value.ID
-  return Array.isArray(userAnswers.value[questionId]) && userAnswers.value[questionId].length > 0
+  return Array.isArray(userAnswers.value[questionId]) && 
+         userAnswers.value[questionId].length > 0
 })
-
 // Методы
 const fetchQuiz = async () => {
   try {
@@ -430,7 +443,7 @@ const toggleAnswer = (answer) => {
   const answerId = answer.id || answer.ID
   const currentAnswers = [...(userAnswers.value[questionId] || [])]
   
-  if (currentQuestion.value.isMultiple) {
+  if (isMultipleChoice.value) {
     // Множественный выбор
     const index = currentAnswers.indexOf(answerId)
     if (index === -1) {
