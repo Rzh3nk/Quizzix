@@ -184,7 +184,7 @@ const checkAuth = async () => {
   const storedUser = localStorage.getItem('user')
   
   if (storedToken && storedUser) {
-    try {
+    /*try {
       // Проверяем валидность токена через API
       const response = await api.get('/auth/verify', {
         headers: {
@@ -209,7 +209,8 @@ const checkAuth = async () => {
       user.value = JSON.parse(storedUser)
       api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
       return true
-    }
+    }*/
+   return true
   }
   return false
 }

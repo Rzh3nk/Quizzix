@@ -33,8 +33,10 @@ func main() {
 	//раутеры
 	r := gin.Default()
 	r.GET("/api/quizzes", getQuizzes)
+	r.GET("/api/quizzes/:id", getQuizByID)
 	r.GET("/api/categories/:id/quizzes", getCategoryQuizzes)
 	r.GET("/api/categories", getCategories)
+	r.GET("/api/categories/:id", getCategoryByID)
 	r.GET("/api/quizzes/:id/questions", getQuestions)
 	r.GET("/api/question/:id/answers", getAnswers)
 	r.GET("/api/users/:id", getUser)
