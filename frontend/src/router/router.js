@@ -23,7 +23,6 @@ const routes = [
     {
         path: "/login", // указание маршрута, по которому будем переходить к списку категорий
         name: "login", // имя маршрута
-        alias: "/categories", // указание дополнительного маршрута
         component: () => import('../views/Login.vue'), // компонент, на основании которого будет отрисовываться страница
         meta: {
             title: "Вход"
@@ -46,7 +45,25 @@ const routes = [
         meta: {
             title: "Квизы"
         }
-    }
+    },
+    {
+        path: '/quiz/:id',
+        name: 'quiz',
+        component: () => import('../views/Quiz.vue'),
+        props: true,
+        meta: {
+            title: "Квиз"
+        }
+    },
+    {
+        path: "/create-quiz",
+        name: "create",
+        component: () => import('../views/QuizAdd.vue'),
+        props: true, // указываем, что компонент Category.vue может принимать параметры в адресной строке, например, в path указан id
+        meta: {
+            title: "Создание квиза"
+        }
+    },
 ];
 
 const router = createRouter({
