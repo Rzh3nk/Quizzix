@@ -72,7 +72,7 @@ export default {
     
     const continueAsGuest = () => {
       console.log('Продолжить как гость')
-      alert('Гостевой режим будет доступен после создания компонента CategoriesView')
+      router.push('/main')
     }
     
     return {

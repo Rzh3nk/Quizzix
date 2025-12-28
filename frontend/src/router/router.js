@@ -37,6 +37,15 @@ const routes = [
         meta: {
             title: "Регистрация"
         }
+    },
+    {
+        path: '/category/:id/quizzes',
+        name: 'CategoryQuizzes',
+        component: () => import('../views/CategoryQuizzes.vue'),
+        props: true,
+        meta: {
+            title: "Квизы"
+        }
     }
 ];
 
