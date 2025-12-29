@@ -42,10 +42,10 @@
         <div v-else-if="quiz" class="quiz-content">
           <div class="quiz-header">
             <div class="quiz-image-container">
-              <div v-if="quiz.ImgURL" class="quiz-image-wrapper">
+              <div v-if="quiz.img || quiz.ImgURL" class="quiz-image-wrapper">
                 <img 
-                  :src="getImageUrl(quiz.ImgURL)" 
-                  :alt="quiz.title"
+                  :src="getImageUrl(quiz.img || quiz.ImgURL)" 
+                  :alt="quiz.img || quiz.ImgURL"
                   class="quiz-image"
                   @error="handleImageError"
                 />

@@ -71,7 +71,22 @@
               </div>
               <div v-if="categoryError" class="error-message">{{ categoryError }}</div>
             </div>
-
+            <div class="field">
+              <label class="field-label">
+                <span class="label-icon">🖼️</span>
+                Картинка квиза
+                <span class="required">*</span>
+              </label>
+              <input 
+                v-model="imgUrl" 
+                type="url" 
+                placeholder="https://example.com/image.jpg"
+                class="input-field"
+                :class="{ 'error': imgUrlError }"
+              />
+              <div class="hint">Ссылка на изображение</div>
+              <div v-if="imgUrlError" class="error-message">{{ imgUrlError }}</div>
+            </div>
             <div class="field full-width">
               <label class="field-label">
                 <span class="label-icon">📄</span>
@@ -329,7 +344,15 @@ const description = ref('')
 const categoryId = ref(0)
 const difficulty = ref('medium')
 const timeLimit = ref(30)
+const imgUrl = ref('')
 
+const imgUrlError = computed(() => {
+  if (!imgUrl.value.trim()) return 'Картинка обязательна'
+  if (!imgUrl.value.match(/^https?:\/\/.+\.(jpg|jpeg|png|webp)$/i)) {
+    return 'Введите корректную ссылку на изображение'
+  }
+  return ''
+})
 // Списки
 const categories = ref([])
 const questions = ref([
@@ -375,6 +398,7 @@ const categoryError = computed(() => {
 const isFormValid = computed(() => {
   if (titleError.value) return false
   if (categoryError.value) return false
+  if (imgUrlError.value) return false
   if (questions.value.length === 0) return false
   
   // Проверка всех вопросов
@@ -485,9 +509,10 @@ const authorId = localStorage.getItem('user_id')  // "1"
   
   try {
     const payload = {
-  author_id: parseInt(authorId),
+      author_id: parseInt(authorId),
       title: title.value.trim(),
       description: description.value.trim(),
+      img: imgUrl.value.trim(),
       category_id: categoryId.value,
       difficulty: difficulty.value,
       time_limit: timeLimit.value || 0,
@@ -548,6 +573,7 @@ const saveDraft = () => {
 const resetForm = () => {
   title.value = ''
   description.value = ''
+  imgUrl.value = '' 
   categoryId.value = 0
   difficulty.value = 'medium'
   timeLimit.value = 30

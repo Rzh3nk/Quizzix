@@ -49,7 +49,41 @@
   width: 100%;
   color: white;
 }
+.quiz-image,
+.quiz-img,
+img[src*="quiz"],
+.quiz-image img {
+  max-width: 100%;           /* Не выходит за контейнер */
+  width: 100%;               /* Заполняет контейнер */
+  max-width: 20rem;          /* ✅ 20rem = 320px (адаптивно!) */
+  height: auto;              /* Сохраняет пропорции */
+  object-fit: cover;         /* Обрезает без растяжения */
+  border-radius: 12px;       /* Скругление углов */
+}
 
+/* ✅ Контейнер картинки */
+.quiz-image-container,
+.quiz-image-wrapper {
+  max-width: 20rem;          /* ✅ Ограничение контейнера */
+  width: 100%;
+  overflow: hidden;          /* Скрываем обрезанное */
+}
+
+/* ✅ Сама карточка квиза */
+.quiz-card,
+.quiz-item {
+  max-width: 25rem;          /* ✅ Карточка не шире 400px */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ✅ Сетка квизов — равномерная */
+.quizzes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));  /* ✅ 22rem min! */
+  gap: 1.5rem;
+}
 .breadcrumb-link {
   display: flex;
   align-items: center;

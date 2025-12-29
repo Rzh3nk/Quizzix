@@ -72,8 +72,8 @@
             
             <div class="quiz-image-container">
               <img
-                v-if="quiz.imageURL"
-                :src="getImageUrl(quiz.imageURL)"
+                v-if="quiz.img || quiz.ImgURL"
+                :src="getImageUrl(quiz.img || quiz.ImgURL)"
                 :alt="quiz.title"
                 class="quiz-image"
               />

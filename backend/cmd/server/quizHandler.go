@@ -12,6 +12,7 @@ type createQuizRequest struct {
 	Title       string               `json:"title"`
 	Description string               `json:"description"`
 	CategoryID  uint                 `json:"category_id"`
+	ImgURL      string               `json:"img"`
 	AuthorID    uint                 `json:"author_id"`
 	Questions   []createQuizQuestion `json:"questions"`
 }
@@ -77,14 +78,15 @@ func createQuiz(c *gin.Context) {
 		return
 	}
 
-	if req.Title == "" || len(req.Questions) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "title and questions are required"})
+	if req.Title == "" || req.ImgURL == "" || len(req.Questions) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "title, image and questions are required"})
 		return
 	}
 
 	quiz := models.Quiz{
 		Title:       req.Title,
 		Description: req.Description,
+		ImgURL:      req.ImgURL,
 		CategoryID:  req.CategoryID,
 		AuthorID:    req.AuthorID, // ✅ Текущий пользователь
 	}
