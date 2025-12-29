@@ -143,7 +143,7 @@ func checkTest(c *gin.Context) {
 	// ✅ 7. Безопасный percent (БЕЗ Inf!)
 	percent := 0.0
 	if totalQuestions > 0 {
-		percent = totalScore / float64(totalQuestions) * 100
+		percent = math.Round(totalScore/float64(totalQuestions)*100*100) / 100
 	}
 
 	// ✅ 200 OK с правильными данными

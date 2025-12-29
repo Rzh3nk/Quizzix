@@ -188,11 +188,12 @@ func getUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"id":       user.ID,
-		"username": user.Username,
-		"email":    user.Email,
-		"created":  user.CreatedAt,
-		"role":     user.Role,
+		"id":          user.ID,
+		"username":    user.Username,
+		"email":       user.Email,
+		"total_score": user.TotalScore,
+		"created":     user.CreatedAt,
+		"role":        user.Role,
 	})
 }
 func getUserResults(c *gin.Context) {

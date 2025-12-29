@@ -49,7 +49,7 @@
             >
               <div class="quiz-info">
                 <strong>{{ result.quiz_title || 'Квиз' }}</strong>
-                <span>{{ formatDate(result.created_at) }}</span>
+                <span>{{ formatDate(result.CreatedAt) }}</span>
               </div>
               <div class="result-score">
                 {{ result.score }} / {{ result.max_score }} 
@@ -77,19 +77,16 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// Данные
 const user = ref(null)
 const results = ref([])
 const loading = ref(true)
 const error = ref(null)
 
-// ID пользователя
 const getUserId = () => {
   const userIdStr = localStorage.getItem('user_id')
   return userIdStr ? parseInt(userIdStr) : 0
 }
 
-// Загрузка профиля
 const fetchProfile = async () => {
   try {
     loading.value = true
@@ -100,22 +97,43 @@ const fetchProfile = async () => {
     
     const token = localStorage.getItem('token')
     
-    // 1. Информация о пользователе
     const userRes = await fetch(`/api/users/${id}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     if (!userRes.ok) throw new Error('Ошибка загрузки пользователя')
     user.value = await userRes.json()
     
-    // 2. Последние результаты
     const resultsRes = await fetch(`/api/users/${id}/results`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     if (resultsRes.ok) {
-      const data = await resultsRes.json()
-      results.value = data.slice(0, 10) // Топ-10 последних
+      let resultsData = await resultsRes.json()
+      
+      const quizIds = [...new Set(resultsData.map(r => r.quiz_id || r.QuizID))]
+      
+      const quizTitles = {}
+      if (quizIds.length > 0) {
+        try {
+          const quizzesRes = await fetch(`/api/quizzes?ids=${quizIds.join(',')}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+          if (quizzesRes.ok) {
+            const quizzes = await quizzesRes.json()
+            quizzes.forEach(quiz => {
+              quizTitles[quiz.id || quiz.ID] = quiz.title || quiz.Title
+            })
+          }
+        } catch (quizErr) {
+          console.warn('Не удалось загрузить названия квизов:', quizErr)
+        }
+      }
+      
+      results.value = resultsData.slice(0, 10).map(result => ({
+        ...result,
+        quiz_title: quizTitles[result.quiz_id || result.QuizID] || 'Квиз'
+      }))
     }
-    
+  
   } catch (err) {
     error.value = err.message
   } finally {
@@ -136,17 +154,24 @@ const formatNumber = (num) => {
   return new Intl.NumberFormat('ru-RU').format(num)
 }
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('ru-RU', {
+const formatDate = (dateString) => {
+  if (!dateString || dateString === 'null' || dateString === 'undefined') {
+    return 'Недавно'
+  }
+  
+  const date = new Date(dateString)
+  
+  if (isNaN(date.getTime())) {
+    console.warn('Невалидная дата:', dateString)
+    return 'Неизвестно'
+  }
+  
+  return date.toLocaleDateString('ru-RU', {
     day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit'
+    month: 'long',
+    year: 'numeric'
   })
 }
-
-// Загрузка
 onMounted(() => {
   fetchProfile()
 })
