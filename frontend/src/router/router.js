@@ -82,12 +82,18 @@ const routes = [
     {
         path: '/my-quizzes',
         name: 'MyQuizzes',
-        component: () => import('@/views/MyQuizzes.vue')
+        component: () => import('@/views/MyQuizzes.vue'),
+        meta: {
+            title: "МОи квизы"
+        }
     },
     {
         path: '/leaderboard',
         name: 'Leaderboard',
-        component: () => import('@/views/Leaderboard.vue')
+        component: () => import('@/views/Leaderboard.vue'),
+        meta: {
+            title: "Рейтинг"
+        }
     }
 ];
 

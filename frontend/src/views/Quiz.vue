@@ -14,7 +14,7 @@
         <span class="breadcrumb-separator">›</span>
         <router-link 
           v-if="quiz?.category" 
-          :to="`/categories/${quiz.category_id}`" 
+          :to="`/category/${quiz.category_id}/quizzes`" 
           class="breadcrumb-link"
         >
           {{ quiz.category.name }}
