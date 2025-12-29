@@ -19,6 +19,10 @@ type registerRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+type AdminRequest struct {
+	CallerID uint `json:"caller_id" binding:"required"`
+	TargetID uint `json:"target_id" binding:"required"`
+}
 
 func register(c *gin.Context) {
 	log.Println("registering user")
@@ -52,6 +56,24 @@ func register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "registered"})
+}
+
+func getAllUsers(c *gin.Context) {
+	var users []struct {
+		ID       uint   `json:"id"`
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Role     string `json:"role"`
+	}
+
+	if err := db.Model(&models.User{}).
+		Select("id, username, email, role").
+		Find(&users).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
 }
 
 func login(c *gin.Context) {
@@ -92,9 +114,72 @@ func login(c *gin.Context) {
 		"user_id":  user.ID,
 		"username": user.Username,
 		"email":    user.Email,
+		"role":     user.Role,
 	})
 }
+func setAdmin(c *gin.Context) {
+	var req AdminRequest
 
+	// 1. ✅ Оба ID из BODY
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
+		return
+	}
+
+	// 2. ✅ Проверяем CALLER = админ?
+	var caller models.User
+	if err := db.First(&caller, req.CallerID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "caller not found"})
+		return
+	}
+	var target models.User
+	if err := db.First(&target, req.TargetID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "target not found"})
+		return
+	}
+
+	if caller.Role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error":       "admin only",
+			"caller_id":   req.CallerID,
+			"caller_role": caller.Role,
+		})
+		return
+	}
+	if target.Role == "admin" {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error":       "alreafy admin",
+			"targer_id":   req.TargetID,
+			"target_role": target.Role,
+		})
+		return
+	}
+	if req.CallerID == req.TargetID {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot promote yourself"})
+		return
+	}
+
+	result := db.Model(&models.User{}).
+		Where("id = ?", req.TargetID).
+		Update("role", "admin")
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "target user not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "admin role granted",
+		"caller_id": req.CallerID,
+		"target_id": req.TargetID,
+		"success":   true,
+	})
+}
 func getUser(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
@@ -107,6 +192,7 @@ func getUser(c *gin.Context) {
 		"username": user.Username,
 		"email":    user.Email,
 		"created":  user.CreatedAt,
+		"role":     user.Role,
 	})
 }
 func getUserResults(c *gin.Context) {

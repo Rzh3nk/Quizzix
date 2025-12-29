@@ -84,7 +84,15 @@ const routes = [
         name: 'MyQuizzes',
         component: () => import('@/views/MyQuizzes.vue'),
         meta: {
-            title: "МОи квизы"
+            title: "Мои квизы"
+        }
+    },
+    {
+        path: '/adminpanel',
+        name: 'AdminPanel',
+        component: () => import('@/views/AdminPanel.vue'),
+        meta: {
+            title: "Панель администратора"
         }
     },
     {

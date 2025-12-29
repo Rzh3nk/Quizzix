@@ -58,7 +58,7 @@
                 <span>Мой профиль</span>
               </router-link>
               
-              <router-link to="/settings" class="dropdown-item" @click="closeMenu">
+              <router-link to="/adminpanel" v-if="isAdmin" class="dropdown-item" @click="closeMenu">
                 <span class="dropdown-icon">⚙️</span>
                 <span>Настройки</span>
               </router-link>
@@ -155,7 +155,7 @@
                 <span>Профиль</span>
               </router-link>
               
-              <router-link to="/settings" class="mobile-user-link" @click="closeMobileMenu">
+              <router-link  to="/adminpanel" v-if="isAdmin" class="mobile-user-link" @click="closeMobileMenu">
                 <span class="link-icon">⚙️</span>
                 <span>Настройки</span>
               </router-link>
@@ -186,7 +186,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/store/auth.js'  // ✅ .js обязательно!
+import { useAuthStore } from '@/store/auth.js'  
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -196,7 +196,10 @@ const isAuthenticated = computed(() => {
   // auth.js возвращает isAuthenticated как функцию computed()
   return authStore.isAuthenticated.value || !!authStore.user?.value
 })
-
+const isAdmin = computed(() => {
+  // auth.js возвращает isAuthenticated как функцию computed()
+  return authStore.isAdmin.value || localStorage.getItem('role') === 'admin'
+})
 const user = computed(() => {
   return authStore.user?.value || null  // ✅ .value для ref
 })

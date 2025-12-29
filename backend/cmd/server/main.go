@@ -41,6 +41,7 @@ func main() {
 	r.GET("/api/quizzes/:id/questions", getQuestions)
 	r.GET("/api/question/:id/answers", getAnswers)
 	r.GET("/api/users/:id", getUser)
+	r.GET("/api/users", getAllUsers)
 	r.POST("/api/register", register)
 	r.POST("/api/login", login)
 	r.POST("/api/quizzes/:id/submit", checkTest)
@@ -48,6 +49,7 @@ func main() {
 	r.GET("/api/results/:id", getResultsQuizId)
 	r.GET("/api/leaderboard", getLeaderboard)
 	r.POST("/api/quizzes", createQuiz)
+	r.POST("/api/users/setAdmin", setAdmin)
 	log.Println("Backend запущен")
 
 	r.Run(":8080")
@@ -61,7 +63,8 @@ func seedDemoData() {
 		return
 	}
 	testhash, _ := bcrypt.GenerateFromPassword([]byte("test"), bcrypt.DefaultCost)
-
+	adminhash, _ := bcrypt.GenerateFromPassword([]byte("admin"), bcrypt.DefaultCost)
+	db.Create(&models.User{Username: "admin", Email: "admin@mail.ru", Password: string(adminhash), Role: "admin"})
 	db.Create(&models.User{Username: "test", Email: "test@mail.ru", Password: string(testhash)})
 	db.Create(&models.Category{Name: "Наука", Description: "В этой категории представленые науные квизы", ImgURL: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpHNKGMwFfIP-QDg_IL1rph5c4Pa5jLos4uA&s"})
 	db.Create(&models.Category{Name: "Кино", Description: "В этой категории представленые квизы по кино", ImgURL: "https://1gai.ru/uploads/posts/2021-08/1628577646_1.png"})

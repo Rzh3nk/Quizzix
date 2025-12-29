@@ -185,10 +185,11 @@ export default {
         }
         
 
-        const { token, user_id, username, email } = data
+        const { token, user_id, username, email, role } = data
         
         localStorage.setItem('token', token)
         localStorage.setItem('user_id', user_id)
+        localStorage.setItem('role', role)
         localStorage.setItem('username', username)
         localStorage.setItem('email', email)
         
@@ -198,7 +199,8 @@ export default {
           id: user_id,
           username: username,
           email: email,
-          token: token
+          token: token,
+          role: role
         })
         authStore.checkAuth()
       

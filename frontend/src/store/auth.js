@@ -79,7 +79,8 @@ const login = async (credentials) => {
       localStorage.setItem('user', JSON.stringify({
         id: data.user_id,      
         username: data.username,
-        email: data.email
+        email: data.email,
+        role: data.role
       }))
     
     // Добавляем токен в заголовки axios
@@ -110,6 +111,11 @@ const login = async (credentials) => {
   } finally {
     loading.value = false
   }
+}
+
+const isAdmin = () => {
+ 
+  return  localStorage.getItem('role') === 'admin'
 }
 
 const register = async (userData) => {
@@ -313,6 +319,7 @@ export const useAuthStore = () => {
     
     // Действия (основные)
     login,
+    isAdmin,
     register,
     logout,
     checkAuth,

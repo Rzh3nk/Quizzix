@@ -8,4 +8,5 @@ type User struct {
 	Email      string `gorm:"uniqueIndex" json:"email"`
 	Password   string `json:"-"`
 	TotalScore int    `json:"total_score"`
+	Role       string `gorm:"default:'user'" json:"role"`
 }
