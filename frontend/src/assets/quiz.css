@@ -158,6 +158,7 @@
 
 .quiz-image-container {
   flex: 0 0 300px;
+  height: 200px;
   position: relative;
   border-radius: 16px;
   overflow: hidden;

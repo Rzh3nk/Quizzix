@@ -1,7 +1,7 @@
 <template>
-  <div class="categories-page">
+  <div class="categories-page"><Header/>
     <div class="background"></div>
-    <Header/>
+    
     <div class="content-wrapper">
       
       <div class="logo-row">
