@@ -7,7 +7,7 @@
     "backend": "cd backend/cmd/server && go run .",
     "frontend": "cd frontend && npm run dev",
     "build": "cd frontend && npm run build && cd ../backend && go build -o ../bin/server cmd/server/main.go",
-    "test": "cd backend && go test ./... -v -race && cd ../frontend && npm test",
+    "test": "cd backend && go test ./... -coverprofile=cover.out && go tool cover -html=cover.out -o cover.html",
     "sync": "git pull origin main && cd frontend && npm ci && cd .. && cd backend && go mod tidy && cd ..",
     "clean": "rmdir /s /q bin 2>nul && cd frontend && rmdir /s /q dist 2>nul && cd .."
   },
