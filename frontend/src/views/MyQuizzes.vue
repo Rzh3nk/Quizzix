@@ -78,6 +78,9 @@
                 {{ formatDate(quiz.created_at || quiz.CreatedAt) }}
               </div>
             </div>
+            <button @click.stop="deleteQuiz(quiz)" class="delete-btn">
+              🗑️ Удалить
+            </button>
           </div>
         </div>
       </div>
@@ -187,6 +190,42 @@ const fetchMyQuizzes = async () => {
     error.value = err.message
   } finally {
     loading.value = false
+  }
+}
+
+const deleteQuiz = async (quiz) => {
+  if (!confirm(`Удалить квиз "${quiz.title || quiz.Title}"?`)) return
+  
+  const userId = parseInt(localStorage.getItem('user_id'))
+  const quizId = quiz.id || quiz.ID
+  
+  const requestBody = {
+    user_id: userId,   // Кто удаляет
+    quiz_id: quizId    // Что удаляем
+  }
+  
+  try {
+    const token = localStorage.getItem('token')
+    const response = await fetch('/api/quizzes/delete', {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    })
+    
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Ошибка удаления')
+    }
+    
+    // ✅ Удаляем из списка
+    quizzes.value = quizzes.value.filter(q => (q.id || q.ID) !== quizId)
+    alert('✅ Квиз удален!')
+    
+  } catch (err) {
+    alert('❌ ' + err.message)
   }
 }
 
@@ -337,7 +376,22 @@ onMounted(() => {
   margin: 0;
   font-weight: 400;
 }
+.delete-btn {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  width: 100%;
+}
 
+.delete-btn:hover {
+  background: #dc2626;
+}
 .add-btn {
   display: flex;
   align-items: center;

@@ -144,6 +144,13 @@
               <span class="btn-icon">←</span>
               <span class="btn-text">Назад</span>
             </button>
+
+              <button v-if="isAdminUser" 
+                @click="deleteQuiz" 
+                class="delete-btn">
+                <span class="btn-icon">🗑️</span>
+                <span class="btn-text">Удалить</span>
+              </button>
           </div>
         </div>
       </div>
@@ -154,7 +161,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/store/auth.js'  
 
+const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 import Header from '@/components/Header.vue'
@@ -255,6 +264,46 @@ const fetchQuiz = async () => {
 }
 
 
+
+
+const isAdminUser = computed(() => {
+ return authStore.isAdmin.value || localStorage.getItem('role') === 'admin'
+})
+
+// ✅ Удаление квиза
+const deleteQuiz = async () => {
+  if (!confirm(`Удалить квиз "${quiz.value.title}"?`)) return
+  
+  const userId = parseInt(localStorage.getItem('user_id'))
+  const quizId = quiz.value.id || quiz.value.ID
+  
+  const requestBody = {
+    user_id: userId,
+    quiz_id: quizId
+  }
+  
+  try {
+    const token = localStorage.getItem('token')
+    const response = await fetch('/api/quizzes/delete', {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    })
+    
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Ошибка удаления')
+    }
+    
+    alert('✅ Квиз удален!')
+    router.push('/categories')  
+  } catch (err) {
+    alert('❌ ' + err.message)
+  }
+}
 
 const getImageUrl = (path) => {
   if (!path) return ''
@@ -601,7 +650,28 @@ onMounted(() => {
   flex-wrap: wrap;
   margin-bottom: 20px;
 }
+.delete-btn {
+  padding: 18px 40px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  min-width: 200px;
+  justify-content: center;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+}
 
+.delete-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(239, 68, 68, 0.4);
+}
 .quiz-category,
 .quiz-time,
 .quiz-created {

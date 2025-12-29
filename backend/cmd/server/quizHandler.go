@@ -25,6 +25,10 @@ type createQuizAnswer struct {
 	Text      string `json:"text"`
 	IsCorrect bool   `json:"is_correct"`
 }
+type DeleteQuizRequest struct {
+	UserID uint `json:"user_id" binding:"required"`
+	QuizID uint `json:"quiz_id" binding:"required"`
+}
 
 func getQuizzes(c *gin.Context) {
 	var quizzes []models.Quiz
@@ -125,5 +129,48 @@ func createQuiz(c *gin.Context) {
 		"title":       quiz.Title,
 		"description": quiz.Description,
 		"category_id": quiz.CategoryID,
+	})
+}
+
+func deleteQuiz(c *gin.Context) {
+	var req DeleteQuizRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
+		return
+	}
+
+	var quiz models.Quiz
+	if err := db.First(&quiz, req.QuizID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "quiz not found"})
+		return
+	}
+
+	var user models.User
+	if err := db.First(&user, req.UserID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	if quiz.AuthorID != req.UserID && user.Role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error":           "not authorized",
+			"quiz_author_id":  quiz.AuthorID,
+			"request_user_id": req.UserID,
+			"user_role":       user.Role,
+		})
+		return
+	}
+
+	if err := db.Delete(&models.Quiz{}, req.QuizID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "delete error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "quiz deleted",
+		"quiz_id": req.QuizID,
+		"user_id": req.UserID,
+		"success": true,
 	})
 }

@@ -50,6 +50,7 @@ func main() {
 	r.GET("/api/leaderboard", getLeaderboard)
 	r.POST("/api/quizzes", createQuiz)
 	r.POST("/api/users/setAdmin", setAdmin)
+	r.POST("/api/quizzes/delete", deleteQuiz)
 	log.Println("Backend запущен")
 
 	r.Run(":8080")
