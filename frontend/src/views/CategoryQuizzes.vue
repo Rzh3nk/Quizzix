@@ -14,8 +14,8 @@
       </div>
 
       <div v-if="category" class="category-header">
-        <div v-if="category.imageURL" class="category-header-image">
-          <img :src="getImageUrl(category.imageURL)" :alt="category.name" />
+        <div v-if="category.img" class="category-header-image">
+          <img :src="getImageUrl(category.img)" :alt="category.name" />
         </div>
         <div v-else class="category-header-icon" :style="{ background: getCategoryGradient(category.name) }">
           {{ getCategoryIcon(category.name) }}
