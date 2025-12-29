@@ -205,22 +205,7 @@ const isAuthenticated = computed(() => {
 //Градиенты для категорий
 const getCategoryGradient = (categoryName) => {
   const gradientMap = {
-    'Наука': 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-    'Science': 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-    'Кино': 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
-    'Movies': 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
-    'История': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
-    'History': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
-    'География': 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
-    'Geography': 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
-    'Музыка': 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
-    'Music': 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
-    'Спорт': 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)',
-    'Sports': 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)',
-    'Литература': 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
-    'Literature': 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
-    'Технологии': 'linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%)',
-    'Technology': 'linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%)'
+   
   }
   return gradientMap[categoryName] || 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)'
 }
