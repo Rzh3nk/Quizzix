@@ -92,8 +92,8 @@
             <div class="question-content">
               <h2 class="question-text">{{ currentQuestion.text || currentQuestion.Text }}</h2>
               
-              <div v-if="currentQuestion.image" class="question-image">
-                <img :src="getImageUrl(currentQuestion.image)" :alt="currentQuestion.text">
+              <div v-if="currentQuestion.img || currentQuestion.ImgURL" class="question-image">
+                <img :src="getImageUrl(currentQuestion.img || currentQuestion.ImgURL)" :alt="currentQuestion.text">
               </div>
             </div>
 

@@ -19,6 +19,7 @@ type createQuizRequest struct {
 
 type createQuizQuestion struct {
 	Text    string             `json:"text"`
+	ImgURL  string             `json:"img"`
 	Answers []createQuizAnswer `json:"answers"`
 }
 
@@ -88,7 +89,7 @@ func createQuiz(c *gin.Context) {
 		Description: req.Description,
 		ImgURL:      req.ImgURL,
 		CategoryID:  req.CategoryID,
-		AuthorID:    req.AuthorID, // ✅ Текущий пользователь
+		AuthorID:    req.AuthorID,
 	}
 
 	if err := db.Create(&quiz).Error; err != nil {
@@ -102,6 +103,7 @@ func createQuiz(c *gin.Context) {
 
 		question := models.Question{
 			Text:   qReq.Text,
+			ImgURL: qReq.ImgURL,
 			QuizID: quiz.ID,
 		}
 

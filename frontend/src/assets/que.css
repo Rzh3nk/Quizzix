@@ -370,10 +370,12 @@
   border-radius: 10px;
   overflow: hidden;
   margin-top: 15px;
+  display: grid;
+  place-items: center;
 }
 
 .question-image img {
-  width: 100%;
+  width: 60%;
   height: auto;
   display: block;
 }

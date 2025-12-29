@@ -164,7 +164,28 @@
                     {{ questionError(qIndex) }}
                   </div>
                 </div>
-
+                <div class="field">
+                  <label class="field-label">
+                    <span class="label-icon">🖼️</span>
+                    Картинка к вопросу
+                  </label>
+                  <input
+                    v-model="question.img"
+                    type="url"
+                    placeholder="https://example.com/image.jpg"
+                    class="input-field"
+                  />
+                  <div class="hint">Ссылка на изображение (опционально)</div>
+                  
+                  <!-- ✅ ПРЕДВАРИТЕЛЬНЫЙ ПРОСМОТР -->
+                  <div v-if="question.img" class="image-preview">
+                    <img 
+                      :src="question.img" 
+                      :alt="question.text.substring(0, 30) + '...'" 
+                      @error="question.img = ''"
+                    />
+                  </div>
+                </div>
                 <!-- Ответы для вопроса -->
                 <div class="answers-section">
                   <div class="answers-header">
@@ -358,6 +379,7 @@ const categories = ref([])
 const questions = ref([
   {
     text: '',
+    img: '',
     answers: [
       { text: '', is_correct: false },
       { text: '', is_correct: true },
@@ -439,6 +461,7 @@ const getDifficultyText = (diff) => {
 const addQuestion = () => {
   questions.value.push({
     text: '',
+    img:'',
     answers: [
       { text: '', is_correct: false },
       { text: '', is_correct: true },
@@ -518,6 +541,7 @@ const authorId = localStorage.getItem('user_id')  // "1"
       time_limit: timeLimit.value || 0,
       questions: questions.value.map((q) => ({
         text: q.text.trim(),
+        img: q.img.trim(),
         answers: q.answers.map((a) => ({
           text: a.text.trim(),
           is_correct: a.is_correct,

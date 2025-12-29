@@ -198,7 +198,21 @@ const fetchQuiz = async () => {
     } catch (err) {
       console.warn('Не удалось загрузить статистику:', err)
     }
-    
+    if (quizData.author_id || quizData.AuthorID) {
+      const authorId = quizData.author_id || quizData.AuthorID
+      try {
+        const authorResponse = await fetch(`/api/users/${authorId}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        })
+        
+        if (authorResponse.ok) {
+          const author = await authorResponse.json()
+          quizData.authorName = author.username || 'Неизвестный автор'
+        }
+      } catch {
+        quizData.authorName = 'Неизвестный автор'
+      }
+    }
     //Категория
     if (quizData.category_id || quizData.CategoryID) {
       const categoryId = quizData.category_id || quizData.CategoryID
