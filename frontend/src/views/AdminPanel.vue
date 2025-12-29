@@ -1,11 +1,27 @@
 <template>
-  <div class="admin-panel">
-    <!-- Заголовок -->
+  <div class="categories-page">
+    <div class="background"></div>
+    <Header/>
+    <div class="content-wrapper">
+
     <div class="header">
       <h1>👑 Админ панель</h1>
       <button @click="goBack">← Назад</button>
     </div>
-
+    <div class="search-container">
+        <div class="input-wrapper">
+          <span class="input-icon">🔍</span>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Поиск пользователя..."
+            @input="handleSearch"
+          />
+          <button v-if="searchQuery" @click="clearSearch" class="clear-search-btn">
+            ✕
+          </button>
+        </div>
+      </div>
     <!-- Только для админа -->
     <div v-if="!isAdmin" class="access-denied">
       <h2>🚫 Доступ запрещен</h2>
@@ -20,20 +36,19 @@
       {{ error }}
       <button @click="fetchUsers">Повторить</button>
     </div>
-
+    
     <!-- Список пользователей -->
     <div v-else class="users-list">
       <div class="table-header">
         <span>ID</span>
         <span>Username</span>
         <span>Email</span>
-        <span>Баллы</span>
         <span>Роль</span>
         <span>Действия</span>
       </div>
       
       <div 
-        v-for="user in users" 
+        v-for="user in filteredUser" 
         :key="user.id"
         class="user-row"
         :class="{ 'is-admin': user.role === 'admin' }"
@@ -41,7 +56,6 @@
         <span>{{ user.id }}</span>
         <span>{{ user.username }}</span>
         <span>{{ user.email }}</span>
-        <span>{{ formatNumber(user.total_score || 0) }}</span>
         <span :class="user.role === 'admin' ? 'admin-role' : 'user-role'">
           {{ user.role }}
         </span>
@@ -55,15 +69,18 @@
       </div>
     </div>
   </div>
+    </div>
+    
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth.js'  
 const authStore = useAuthStore()
 const router = useRouter()
-
+const searchQuery = ref('')
+import Header from '@/components/Header.vue'
 // Данные
 const users = ref([])
 const loading = ref(true)
@@ -103,6 +120,22 @@ const fetchUsers = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const filteredUser = computed(() => {
+  if (!searchQuery.value) return users.value
+  
+  const query = searchQuery.value.toLowerCase()
+  return users.value.filter(user => 
+    user.username.toLowerCase().includes(query) 
+  )
+})
+const handleSearch = () => {
+  console.log('Поиск:', searchQuery.value)
+}
+
+const clearSearch = () => {
+  searchQuery.value = ''
 }
 
 // Сделать админом
@@ -147,7 +180,11 @@ const formatNumber = (num) => {
 }
 
 const goBack = () => {
-  router.push('/profile')
+  if (window.history.length > 1) {
+      router.back()
+    } else {
+      router.push('/main')
+    }
 }
 
 // Загрузка
@@ -157,6 +194,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+    @import '@/assets/categories.css';
 .admin-panel {
   max-width: 1000px;
   margin: 0 auto;
