@@ -1,11 +1,9 @@
 <template>
   <div class="category-quizzes-page">
-    <!-- Фон -->
     <div class="background"></div>
-<Header/>
-    <!-- Контент -->
+    <Header/>
     <div class="content-wrapper">
-      <!-- Хлебные крошки -->
+      <!--Хлебные крошки-->
       <div class="breadcrumbs">
         <router-link to="/categories" class="breadcrumb-link">
           <span class="breadcrumb-icon">📚</span>
@@ -15,7 +13,6 @@
         <span class="breadcrumb-current">{{ category?.name || 'Загрузка...' }}</span>
       </div>
 
-      <!-- Заголовок категории -->
       <div v-if="category" class="category-header">
         <div v-if="category.imageURL" class="category-header-image">
           <img :src="getImageUrl(category.imageURL)" :alt="category.name" />
@@ -29,14 +26,14 @@
           <div class="category-stats">
             <div class="stat">
               <span class="stat-icon">📊</span>
+              <span class="stat-label">Квизов: </span>
               <span class="stat-value">{{ quizzes.length }}</span>
-              <span class="stat-label">квизов</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Фильтры -->
+      <!--Поиск-->
       <div class="controls">
         <div class="search-box">
           <span class="search-icon">🔍</span>
@@ -47,30 +44,13 @@
             @input="handleSearch"
           />
         </div>
-        
-        <div class="filters">
-          <select v-model="selectedDifficulty" @change="applyFilters" class="filter-select">
-            <option value="">Все уровни</option>
-            <option value="easy">Лёгкий</option>
-            <option value="medium">Средний</option>
-            <option value="hard">Сложный</option>
-          </select>
-          
-          <select v-model="sortBy" @change="applyFilters" class="filter-select">
-            <option value="createdAt">Новые</option>
-            <option value="rating">По рейтингу</option>
-            <option value="popular">По популярности</option>
-          </select>
-        </div>
       </div>
 
-      <!-- Лоадер -->
       <div v-if="loading" class="loading-state">
         <div class="loading-spinner"></div>
         <p>Загрузка квизов...</p>
       </div>
 
-      <!-- Ошибка -->
       <div v-else-if="error" class="error-state">
         <span class="error-icon">⚠️</span>
         <p>{{ error }}</p>
@@ -81,13 +61,7 @@
 
       <!-- Квизы -->
       <div v-else class="quizzes-container">
-        <!-- Счетчик -->
-        <div v-if="quizzes.length > 0" class="quizzes-count">
-          <span class="count-number">{{ filteredQuizzes.length }}</span>
-          <span class="count-text">квизов найдено</span>
-        </div>
 
-        <!-- Сетка квизов - ИЗМЕНЕНО -->
         <div v-if="filteredQuizzes.length > 0" class="quizzes-grid">
           <div
             v-for="quiz in filteredQuizzes"
@@ -95,7 +69,7 @@
             class="quiz-card"
             @click="goToQuiz(quiz.ID)"
           >
-            <!-- Изображение квиза -->
+            
             <div class="quiz-image-container">
               <img
                 v-if="quiz.imageURL"
@@ -111,26 +85,16 @@
               </div>
             </div>
 
-            <!-- Контент квиза -->
             <div class="quiz-content">
               <h3 class="quiz-title">{{ quiz.title }}</h3>
               <p class="quiz-description">{{ quiz.description || 'Без описания' }}</p>
               
-              <!-- Статистика квиза -->
+              <!--Статистика-->
               <div class="quiz-stats">
                 <div class="quiz-stat">
                   <span class="stat-icon">❓</span>
+                  <span class="stat-label">Вопросов: </span>
                   <span class="stat-value">{{ quiz.questionCount || 0 }}</span>
-                  <span class="stat-label">вопросов</span>
-                </div>
-                <div v-if="quiz.timeLimit" class="quiz-stat">
-                  <span class="stat-icon">⏱️</span>
-                  <span class="stat-value">{{ quiz.timeLimit }}</span>
-                  <span class="stat-label">мин</span>
-                </div>
-                <div v-if="quiz.rating" class="quiz-stat">
-                  <span class="stat-icon">⭐</span>
-                  <span class="stat-value">{{ quiz.rating.toFixed(1) }}</span>
                 </div>
                 <div v-if="quiz.plays" class="quiz-stat">
                   <span class="stat-icon">👤</span>
@@ -145,7 +109,6 @@
               </div>
             </div>
 
-            <!-- Кнопка -->
             <button class="start-quiz-btn">
               <span>Начать квиз</span>
               <span class="arrow">→</span>
@@ -153,11 +116,11 @@
           </div>
         </div>
 
-        <!-- Сообщение если квизов нет -->
+        <!--Если квизов нет-->
         <div v-if="!loading && filteredQuizzes.length === 0" class="empty-state">
           <span class="empty-icon">📭</span>
           <h3>Квизы не найдены</h3>
-          <p v-if="searchQuery || selectedDifficulty">
+          <p v-if="searchQuery">
             Попробуйте изменить параметры поиска
           </p>
           <p v-else>
@@ -172,7 +135,6 @@
         </div>
       </div>
 
-      <!-- Кнопка "Назад" -->
       <button @click="goBack" class="back-btn">
         <span class="back-icon">←</span>
         <span>Назад к категориям</span>
@@ -190,20 +152,13 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 
-//const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-
-// Данные
 const category = ref(null)
 const quizzes = ref([])
 const loading = ref(false)
 const error = ref(null)
 
-// Фильтры
 const searchQuery = ref('')
-const selectedDifficulty = ref('')
-const sortBy = ref('createdAt')
 
-// Получение ID категории из URL
 const categoryId = computed(() => route.params.id)
 
 // Загрузка квизов категории
@@ -227,17 +182,9 @@ const fetchCategoryQuizzes = async () => {
     category.value = await categoryResponse.json()
 
 
-    // Формируем URL с параметрами
     let url = `/api/categories/${categoryId.value}/quizzes`
     const params = []
     
-    if (selectedDifficulty.value) {
-      params.push(`difficulty=${selectedDifficulty.value}`)
-    }
-    
-    if (sortBy.value) {
-      params.push(`sort=${sortBy.value}`)
-    }
     
     if (searchQuery.value) {
       params.push(`search=${encodeURIComponent(searchQuery.value)}`)
@@ -280,7 +227,6 @@ const fetchCategoryQuizzes = async () => {
             const questions = await questionsResponse.json()
             const questionCount = Array.isArray(questions) ? questions.length : 0
             
-            // ✅ Добавляем questionCount
             return {
               ...quiz,
               questionCount: questionCount
@@ -290,11 +236,10 @@ const fetchCategoryQuizzes = async () => {
           console.warn(`Не удалось загрузить вопросы для квиза ${quiz.id || quiz.ID}:`, err)
         }
         
-        return quiz  // Возвращаем без questionCount
+        return quiz  
       })
     )
     
-    // 4. ✅ Сохраняем
     quizzes.value = quizzesWithQuestionCount
     console.log('Данные загружены:', data)
     
@@ -307,7 +252,7 @@ const fetchCategoryQuizzes = async () => {
   }
 }
 
-// Получение URL изображения
+//Получение URL изображения
 const getImageUrl = (imagePath) => {
   if (!imagePath) return ''
   
@@ -316,17 +261,16 @@ const getImageUrl = (imagePath) => {
   }
   
   if (imagePath.startsWith('/')) {
-    return `${API_URL}${imagePath}`
+    return `${imagePath}`
   }
   
-  return `${API_URL}/uploads/${imagePath}`
+  return `/uploads/${imagePath}`//Здесь что-то по-другому было написано
 }
 
-// Фильтрация квизов на клиенте (дополнительная к серверной)
+// Фильтрация квизов 
 const filteredQuizzes = computed(() => {
   let filtered = [...quizzes.value]
   
-  // Дополнительный поиск на клиенте (если нужно)
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(quiz =>
@@ -335,27 +279,11 @@ const filteredQuizzes = computed(() => {
     )
   }
   
-  // Дополнительная фильтрация по сложности на клиенте
-  if (selectedDifficulty.value) {
-    filtered = filtered.filter(quiz => quiz.difficulty === selectedDifficulty.value)
-  }
-  
-  // Сортировка на клиенте
-  filtered.sort((a, b) => {
-    switch (sortBy.value) {
-      case 'rating':
-        return (b.rating || 0) - (a.rating || 0)
-      case 'popular':
-        return (b.plays || 0) - (a.plays || 0)
-      default:
-        return new Date(b.createdAt) - new Date(a.createdAt)
-    }
-  })
   
   return filtered
 })
 
-// Проверка авторизации
+
 const isAuthenticated = computed(() => {
   return authStore.isAuthenticated?.value || false
 })
@@ -405,18 +333,8 @@ const getQuizIcon = (quizTitle) => {
   return '❓'
 }
 
-const getDifficultyText = (difficulty) => {
-  const texts = {
-    'easy': 'Лёгкий',
-    'medium': 'Средний',
-    'hard': 'Сложный'
-  }
-  return texts[difficulty] || difficulty
-}
 
-// Методы
 const handleSearch = () => {
-  // Debounce для поиска
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
     applyFilters()
@@ -429,12 +347,7 @@ const applyFilters = () => {
   fetchCategoryQuizzes()
 }
 
-const resetFilters = () => {
-  searchQuery.value = ''
-  selectedDifficulty.value = ''
-  sortBy.value = 'createdAt'
-  applyFilters()
-}
+
 
 const goToQuiz = (quizId) => {
   router.push(`/quiz/${quizId}`)
@@ -452,14 +365,14 @@ const goBack = () => {
   router.push('/main')
 }
 
-// Наблюдаем за изменением категории в URL
+
 watch(categoryId, () => {
   if (categoryId.value) {
     fetchCategoryQuizzes()
   }
 })
 
-// При загрузке страницы
+
 onMounted(() => {
   if (categoryId.value) {
     fetchCategoryQuizzes()
