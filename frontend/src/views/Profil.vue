@@ -440,6 +440,7 @@ onMounted(() => {
   gap: 20px;
   justify-content: center;
   flex-wrap: wrap;
+  
 }
 
 .action-btn {
@@ -454,6 +455,7 @@ onMounted(() => {
   text-decoration: none;
   transition: all 0.3s ease;
   min-width: 180px;
+  border: 2px solid rgba(178, 175, 250, 0.3);
 }
 
 .action-btn:hover {
