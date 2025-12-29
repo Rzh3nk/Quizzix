@@ -1,22 +1,17 @@
 <template>
   <div class="register-page">
-    <!-- Фон -->
     <div class="background"></div>
-    
-    <!-- Контент -->
     <div class="content-wrapper">
-      <!-- Логотип и название на одной строке -->
       <div class="logo-row">
         <div class="logo-circle">Q</div>
         <h1>Регистрация</h1>
       </div>
       
-      <!-- Подзаголовок -->
       <p class="subtitle">Создайте аккаунт для доступа ко всем функциям</p>
       
-      <!-- Форма регистрации -->
+      <!--Форма-->
       <form class="register-form" @submit.prevent="handleSubmit">
-        <!-- Имя пользователя -->
+    
         <div class="form-group">
           <label for="username">Имя пользователя</label>
           <div class="input-wrapper">
@@ -40,7 +35,6 @@
           </div>
         </div>
         
-        <!-- Email -->
         <div class="form-group">
           <label for="email">Email</label>
           <div class="input-wrapper">
@@ -61,7 +55,6 @@
           </div>
         </div>
         
-        <!-- Пароль -->
         <div class="form-group">
           <label for="password">Пароль</label>
           <div class="input-wrapper">
@@ -93,7 +86,6 @@
           </div>
         </div>
         
-        <!-- Подтверждение пароля -->
         <div class="form-group">
           <label for="confirmPassword">Подтвердите пароль</label>
           <div class="input-wrapper">
@@ -119,8 +111,7 @@
             {{ errors.confirmPassword }}
           </div>
         </div>
-        
-        <!-- Кнопка регистрации -->
+       
         <button 
           type="submit" 
           class="submit-btn"
@@ -132,8 +123,7 @@
             Регистрация...
           </span>
         </button>
-        
-        <!-- Сообщение об успехе -->
+       
         <div v-if="successMessage" class="success-message">
           <div class="success-icon">✅</div>
           <p>{{ successMessage }}</p>
@@ -143,15 +133,12 @@
         </div>
       </form>
       
-      <!-- Ссылка на вход -->
       <div class="auth-link">
         <p>Уже есть аккаунт?</p>
         <router-link to="/login" class="link">
           Войти
         </router-link>
       </div>
-      
-
     </div>
   </div>
 </template>
@@ -166,7 +153,6 @@ export default {
   setup() {
     const router = useRouter()
     
-    // Состояния формы
     const form = reactive({
       username: '',
       email: '',
@@ -174,16 +160,13 @@ export default {
       confirmPassword: ''
     })
     
-    // Состояния UI
     const showPassword = ref(false)
     const showConfirmPassword = ref(false)
     const loading = ref(false)
     const errors = reactive({})
     const successMessage = ref('')
     
-    
-    
-    // Методы
+  
     const togglePasswordVisibility = () => {
       showPassword.value = !showPassword.value
     }
@@ -201,7 +184,6 @@ export default {
     const validateForm = () => {
       const newErrors = {}
       
-      // Валидация имени пользователя (по требованиям бэкенда)
       if (!form.username.trim()) {
         newErrors.username = 'Имя пользователя обязательно'
       } else if (form.username.length < 3) {
@@ -212,7 +194,6 @@ export default {
         newErrors.username = 'Только латинские буквы, цифры и подчеркивание'
       }
       
-      // Валидация email
       if (!form.email.trim()) {
         newErrors.email = 'Email обязателен'
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
@@ -221,7 +202,6 @@ export default {
         newErrors.email = 'Максимум 100 символов'
       }
       
-      // Валидация пароля
       if (!form.password) {
         newErrors.password = 'Пароль обязателен'
       } else if (form.password.length < 6) {
@@ -230,12 +210,10 @@ export default {
         newErrors.password = 'Максимум 72 символа'
       }
       
-      // Валидация подтверждения пароля
       if (form.password !== form.confirmPassword) {
         newErrors.confirmPassword = 'Пароли не совпадают'
       }
       
-      // Обновляем ошибки
       Object.keys(errors).forEach(key => {
         if (!newErrors[key]) errors[key] = ''
       })
@@ -278,16 +256,14 @@ export default {
           }
         }
         
-        // Успешная регистрация
         successMessage.value = 'Регистрация успешна! Вы можете войти в систему.'
         
-        // Очистка формы
         form.username = ''
         form.email = ''
         form.password = ''
         form.confirmPassword = ''
         
-        // Автоматический переход на страницу входа через 3 секунды
+        //Переход на страницу входа через 3 секунды
         setTimeout(() => {
           router.push('/login')
         }, 3000)
@@ -295,7 +271,6 @@ export default {
       } catch (error) {
         console.error('Ошибка регистрации:', error)
         
-        // Отображение ошибки пользователю
         if (error.message.includes('уже существует')) {
           errors.username = error.message
         } else {

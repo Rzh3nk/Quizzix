@@ -7,7 +7,7 @@
         <h1>Вход в систему</h1>
       </div>
       
-      <p class="subtitle">Войдите в свой аккаунт QuizMaster</p>
+      <p class="subtitle">Войдите в свой аккаунт Quizzix</p>
       
       <!--Форма-->
       <form class="login-form" @submit.prevent="handleSubmit">
@@ -218,8 +218,6 @@ export default {
         loading.value = false
       }
     }
-    
-    
     
     return {
       form,

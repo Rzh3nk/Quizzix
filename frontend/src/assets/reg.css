@@ -1,5 +1,3 @@
-
-/* Базовые стили */
 .register-page {
   position: fixed;
   top: 0;
@@ -14,7 +12,6 @@
   min-height: 100vh;
 }
 
-/* Фон */
 .background {
   position: fixed;
   top: 0;
@@ -33,7 +30,6 @@
   z-index: -1;
 }
 
-/* Центральный контейнер */
 .content-wrapper {
   min-height: 100vh;
   display: flex;
@@ -45,7 +41,6 @@
   text-align: center;
 }
 
-/* Логотип и название на одной строке */
 .logo-row {
   display: flex;
   align-items: center;
@@ -78,7 +73,6 @@ h1 {
   text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Подзаголовок */
 .subtitle {
   font-size: 1.1rem;
   color: rgba(255, 255, 255, 0.9);
@@ -88,7 +82,6 @@ h1 {
   width: 100%;
 }
 
-/* Форма */
 .register-form {
   width: 100%;
   background: rgba(255, 255, 255, 0.95);
@@ -98,7 +91,6 @@ h1 {
   margin-bottom: 30px;
 }
 
-/* Группы формы */
 .form-group {
   margin-bottom: 25px;
   text-align: left;
@@ -117,7 +109,6 @@ h1 {
   color: #ef4444;
 }
 
-/* Поля ввода */
 .input-wrapper {
   position: relative;
   display: flex;
@@ -175,7 +166,6 @@ input.error:focus {
   color: #4f46e5;
 }
 
-/* Подсказки и ошибки */
 .hint {
   font-size: 0.8rem;
   color: #6b7280;
@@ -189,7 +179,6 @@ input.error:focus {
   font-weight: 500;
 }
 
-/* Сообщение об успехе */
 .success-message {
   margin-top: 20px;
   padding: 20px;
@@ -226,7 +215,6 @@ input.error:focus {
   text-decoration: underline;
 }
 
-/* Кнопка отправки */
 .submit-btn {
   width: 100%;
   padding: 16px;
@@ -272,7 +260,6 @@ input.error:focus {
   to { transform: rotate(360deg); }
 }
 
-/* Ссылка на вход */
 .auth-link {
   display: flex;
   align-items: center;

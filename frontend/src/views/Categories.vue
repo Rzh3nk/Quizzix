@@ -1,22 +1,17 @@
 <template>
   <div class="categories-page">
-
-    <!-- Фон -->
     <div class="background"></div>
     <Header/>
-    <!-- Контент -->
     <div class="content-wrapper">
       
-      <!-- Логотип и название -->
       <div class="logo-row">
         <div class="logo-circle">Q</div>
         <h1>Категории Quizzix</h1>
       </div>
 
-      <!-- Подзаголовок -->
       <p class="subtitle">Выберите интересующую категорию и проверьте свои знания</p>
 
-      <!-- Поиск -->
+      <!--Поиск-->
       <div class="search-container">
         <div class="input-wrapper">
           <span class="input-icon">🔍</span>
@@ -32,13 +27,11 @@
         </div>
       </div>
 
-      <!-- Лоадер -->
       <div v-if="loading" class="loading-state">
         <div class="loading-spinner"></div>
         <p>Загрузка категорий...</p>
       </div>
 
-      <!-- Ошибка -->
       <div v-else-if="error" class="error-state">
         <span class="error-icon">⚠️</span>
         <p>{{ error }}</p>
@@ -47,15 +40,14 @@
         </button>
       </div>
 
-      <!-- Категории -->
       <div v-else class="categories-container">
-        <!-- Счетчик -->
+        <!--Счетчик категрий-->
         <div class="categories-count">
+          <span class="count-text">Найдено категорий: </span>
           <span class="count-number">{{ filteredCategories.length }}</span>
-          <span class="count-text">категорий найдено</span>
         </div>
 
-        <!-- Сетка категорий -->
+        <!--Сам список категорий-->
         <div class="categories-grid">
           <div
             v-for="category in filteredCategories"
@@ -63,44 +55,29 @@
             class="category-card"
             @click="goToCategory(category.ID)"
           >
-            <!-- Верхняя часть с иконкой -->
+            <!--Верхняя часть карточки категории-->
             <div class="category-header" :style="{ background: getCategoryGradient(category.name) }">
               <img 
-            v-if="category.img"
-            :src="category.img"
-            alt="quiz image"
-            class="quiz-image"
-          />
-              <div v-if="category.isPopular" class="category-badge">🔥</div>
+                v-if="category.img"
+                :src="category.img"
+                alt="quiz image"
+                class="quiz-image"
+              />
             </div>
 
-            <!-- Контент категории -->
             <div class="category-content">
               <h3 class="category-title">{{ category.name }}</h3>
               <p class="category-description">{{ category.description || `Квизы по теме "${category.name}"` }}</p>
 
-              <!-- Статистика -->
               <div class="category-stats">
                 <div class="stat-item">
                   <span class="stat-icon">📊</span>
+                  <span class="stat-label">Квизов: </span>
                   <span class="stat-value">{{ category.QuizCount || 0 }}</span>
-                  <span class="stat-label">квизов</span>
                 </div>
-                <div class="stat-item">
-                  <span class="stat-icon">⭐</span>
-                  <span class="stat-value">{{ category.Difficulty || 'Средняя' }}</span>
-                  <span class="stat-label">сложность</span>
-                </div>
-              </div>
-
-              <!-- Дата создания -->
-              <div v-if="category.CreatedAt" class="category-date">
-                <span class="date-icon">📅</span>
-                <span class="date-text">{{ formatDate(category.CreatedAt) }}</span>
               </div>
             </div>
 
-            <!-- Кнопка -->
             <button class="explore-btn">
               <span>Начать</span>
               <span class="arrow">→</span>
@@ -108,7 +85,6 @@
           </div>
         </div>
 
-        <!-- Сообщение если ничего не найдено -->
         <div v-if="filteredCategories.length === 0 && categories.length > 0" class="empty-state">
           <span class="empty-icon">🔍</span>
           <h3>Категории не найдены</h3>
@@ -117,22 +93,8 @@
             Очистить поиск
           </button>
         </div>
-
-        <!-- Сообщение если категорий нет вообще -->
-        <div v-if="categories.length === 0 && !loading" class="empty-state">
-          <span class="empty-icon">📭</span>
-          <h3>Категории пока отсутствуют</h3>
-          <p>Будьте первым, кто создаст категорию!</p>
-          <button v-if="isAuthenticated" @click="goToCreateCategory" class="cta-btn">
-            Создать категорию
-          </button>
-          <router-link v-else to="/login" class="auth-link">
-            Войдите, чтобы создать категорию
-          </router-link>
-        </div>
       </div>
 
-      <!-- Призыв к действию -->
       <div v-if="isAuthenticated" class="cta-section">
         <div class="cta-card">
           <h3>Хотите создать свой квиз?</h3>
@@ -143,13 +105,12 @@
         </div>
       </div>
 
-      <!-- Навигация -->
       <div class="navigation">
         <router-link to="/" class="nav-link">
           <span class="nav-icon">🏠</span>
           <span>Главная</span>
         </router-link>
-        <router-link v-if="isAuthenticated" to="/dashboard" class="nav-link">
+        <router-link v-if="isAuthenticated" to="/profile" class="nav-link">
           <span class="nav-icon">📊</span>
           <span>Профиль</span>
         </router-link>
@@ -172,14 +133,13 @@ import Header from '@/components/Header.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 const quizCounts = ref({})
-//const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
 const searchQuery = ref('')
 const loading = ref(false)
 const error = ref(null)
 const categories = ref([])
 
-// Загрузка категорий с API
+//Загрузка категорий с API
 const fetchCategories = async () => {
   try {
     loading.value = true
@@ -190,7 +150,6 @@ const fetchCategories = async () => {
     const response = await fetch(`/api/categories`, {
       headers: {
         'Content-Type': 'application/json',
-        //'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     })
     
@@ -210,12 +169,10 @@ const fetchCategories = async () => {
         }
       })
     )
-    // Добавляем дополнительные поля для отображения
+    
     categories.value = data.map(category => ({
       ...category,
       QuizCount: category.QuizCount || 0,
-      Difficulty: category.Difficulty || 'Средняя',
-      isPopular: category.QuizCount > 10 // Пример логики для популярных
     }))
     
     console.log('Категории загружены:', categories.value)
@@ -223,25 +180,12 @@ const fetchCategories = async () => {
   } catch (err) {
     console.error('Ошибка загрузки категорий:', err)
     error.value = err.message || 'Не удалось загрузить категории'
-    
-    // Fallback данные для демонстрации
-    if (process.env.NODE_ENV === 'development') {
-      categories.value = getMockCategories()
-    }
   } finally {
     loading.value = false
   }
 }
-const loadQuizCount = async (categoryId) => {
-  try {
-    const response = await fetch(`/api/categories/${categoryId}/quizzes`)
-    const quizzes = await response.json()
-    quizCounts.value[categoryId] = quizzes.length  // ✅ Считаем!
-  } catch (err) {
-    quizCounts.value[categoryId] = 0
-  }
-}
-// Фильтрация категорий по поиску
+
+//Фильтрация категорий по поиску
 const filteredCategories = computed(() => {
   if (!searchQuery.value) return categories.value
   
@@ -251,14 +195,14 @@ const filteredCategories = computed(() => {
   )
 })
 
-// Проверка авторизации
+//Проверка авторизации
 const isAuthenticated = computed(() => {
   return authStore.isAuthenticated?.value || false
 })
 
 
 
-// Градиенты для категорий
+//Градиенты для категорий
 const getCategoryGradient = (categoryName) => {
   const gradientMap = {
     'Наука': 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
@@ -281,26 +225,9 @@ const getCategoryGradient = (categoryName) => {
   return gradientMap[categoryName] || 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)'
 }
 
-// Форматирование даты
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  
-  try {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    })
-  } catch {
-    return dateString
-  }
-}
-
 
 // Методы
 const handleSearch = () => {
-  // Можно добавить debounce для оптимизации
   console.log('Поиск:', searchQuery.value)
 }
 
@@ -319,18 +246,11 @@ const goToCreateQuiz = () => {
     router.push('/login?redirect=/create-quiz')
   }
 }
-
-const goToCreateCategory = () => {
-  router.push('/create-category')
-}
-
-// При загрузке страницы
 onMounted(() => {
   fetchCategories()
 })
 </script>
 
 <style scoped>
-/* Стили только для этого компонента */
 @import '@/assets/categories.css';
 </style>
