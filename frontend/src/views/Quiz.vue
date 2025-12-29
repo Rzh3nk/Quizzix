@@ -1,9 +1,7 @@
 <template>
   <div class="quiz-detail-page">
-    <!-- Фон -->
     <div class="background"></div>
-<Header/>
-    <!-- Контент -->
+    <Header/>
     <div class="content-wrapper">
       <!-- Хлебные крошки -->
       <div class="breadcrumbs">
@@ -24,15 +22,13 @@
         <span class="breadcrumb-current">{{ quiz?.title || 'Квиз' }}</span>
       </div>
 
-      <!-- Основной контент -->
+      
       <div class="quiz-detail-container">
-        <!-- Состояние загрузки -->
         <div v-if="loading" class="loading-state">
           <div class="spinner"></div>
           <p>Загрузка квиза...</p>
         </div>
 
-        <!-- Состояние ошибки -->
         <div v-else-if="error" class="error-state">
           <span class="error-icon">⚠️</span>
           <h3>Квиз не найден</h3>
@@ -44,9 +40,7 @@
 
         <!-- Контент квиза -->
         <div v-else-if="quiz" class="quiz-content">
-          <!-- Шапка квиза -->
           <div class="quiz-header">
-            <!-- Изображение квиза -->
             <div class="quiz-image-container">
               <div v-if="quiz.ImgURL" class="quiz-image-wrapper">
                 <img 
@@ -59,11 +53,6 @@
               <div v-else class="quiz-image-placeholder">
                 {{ getQuizIcon(quiz.title) }}
               </div>
-              
-              <!-- Бейдж сложности -->
-              <div v-if="quiz.difficulty" class="quiz-difficulty" :class="quiz.difficulty">
-                {{ getDifficultyText(quiz.difficulty) }}
-              </div>
             </div>
 
             <!-- Основная информация -->
@@ -73,13 +62,9 @@
                   <span class="category-icon">🏷️</span>
                   {{ quiz.category?.name || 'Без категории' }}
                 </span>
-                <span v-if="quiz.timeLimit" class="quiz-time">
-                  <span class="time-icon">⏱️</span>
-                  {{ quiz.timeLimit }} мин
-                </span>
                 <span class="quiz-created">
                   <span class="date-icon">📅</span>
-                  {{ formatDate(quiz.created_at) }}
+                  {{ formatDate(quiz.CreatedAt) }}
                 </span>
               </div>
 
@@ -89,7 +74,6 @@
                 {{ quiz.description || 'Нет описания' }}
               </div>
 
-              <!-- Статистика квиза -->
               <div class="quiz-stats">
                 <div class="stat">
                   <div class="stat-icon">❓</div>
@@ -104,14 +88,6 @@
                   <div class="stat-content">
                     <div class="stat-value">{{ formatNumber(quiz.plays || 0) }}</div>
                     <div class="stat-label">прохождений</div>
-                  </div>
-                </div>
-                
-                <div v-if="quiz.rating" class="stat">
-                  <div class="stat-icon">⭐</div>
-                  <div class="stat-content">
-                    <div class="stat-value">{{ quiz.rating.toFixed(1) }}</div>
-                    <div class="stat-label">рейтинг</div>
                   </div>
                 </div>
               </div>
@@ -131,9 +107,7 @@
             </div>
           </div>
 
-          
-
-          <!-- Кнопки действий -->
+        
           <div class="action-buttons">
             <button @click="startQuiz" class="start-btn">
               <span class="btn-icon">🚀</span>
@@ -168,20 +142,13 @@ const route = useRoute()
 const router = useRouter()
 import Header from '@/components/Header.vue'
 
-// Реактивные данные
 const quiz = ref(null)
 const loading = ref(true)
 const error = ref(null)
-const topResults = ref([])
 
-// Компьютеды
 const quizId = computed(() => route.params.id)
 
-const questionCount = computed(() => {
-  return quiz.value?.Questions?.length || 0
-})
 
-// Методы
 const fetchQuiz = async () => {
   try {
     loading.value = true
@@ -189,7 +156,6 @@ const fetchQuiz = async () => {
     
     console.log('Загрузка квиза:', quizId.value)
     
-    // 1. ✅ Основной квиз
     const quizResponse = await fetch(`/api/quizzes/${quizId.value}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -207,7 +173,7 @@ const fetchQuiz = async () => {
     
     const quizIdNum = quizData.id || quizData.ID
     
-    // 2. ✅ Количество вопросов
+    //Количество вопросов
     try {
       const questionsResponse = await fetch(`/api/quizzes/${quizIdNum}/questions`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -220,7 +186,7 @@ const fetchQuiz = async () => {
       console.warn('Не удалось загрузить вопросы:', err)
     }
     
-    // 3. ✅ Количество прохождений
+    //Количество прохождений
     try {
       const resultsResponse = await fetch(`/api/results/${quizIdNum}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -233,7 +199,7 @@ const fetchQuiz = async () => {
       console.warn('Не удалось загрузить статистику:', err)
     }
     
-    // 4. ✅ Категория (если нужно)
+    //Категория
     if (quizData.category_id || quizData.CategoryID) {
       const categoryId = quizData.category_id || quizData.CategoryID
       try {
@@ -264,13 +230,11 @@ const fetchQuiz = async () => {
 }
 
 
-
-
 const isAdminUser = computed(() => {
  return authStore.isAdmin.value || localStorage.getItem('role') === 'admin'
 })
 
-// ✅ Удаление квиза
+//Удаление
 const deleteQuiz = async () => {
   if (!confirm(`Удалить квиз "${quiz.value.title}"?`)) return
   
@@ -337,14 +301,6 @@ const getQuizIcon = (title) => {
   return '❓'
 }
 
-const getDifficultyText = (difficulty) => {
-  const map = { 
-    easy: 'Лёгкий', 
-    medium: 'Средний', 
-    hard: 'Сложный' 
-  }
-  return map[difficulty] || 'Средний'
-}
 
 const formatDate = (dateString) => {
   if (!dateString || dateString === 'null' || dateString === 'undefined') {
@@ -367,17 +323,6 @@ const formatDate = (dateString) => {
 
 const formatNumber = (num) => {
   return new Intl.NumberFormat('ru-RU').format(num)
-}
-
-const formatDuration = (seconds) => {
-  if (!seconds) return '0 сек'
-  const mins = Math.floor(seconds / 60)
-  const secs = seconds % 60
-  return mins > 0 ? `${mins} мин ${secs} сек` : `${secs} сек`
-}
-
-const getRankIcon = (index) => {
-  return ['🥇', '🥈', '🥉'][index] || '🏅'
 }
 
 const startQuiz = () => {
@@ -406,7 +351,6 @@ watch(quizId, (newId) => {
   }
 })
 
-// Хуки жизненного цикла
 onMounted(() => {
   if (quizId.value) {
     fetchQuiz()
